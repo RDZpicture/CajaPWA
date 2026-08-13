@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caja PWA</title>
+  <style>
+    :root {
+      --bg: #121214;
+      --card: #1e1e24;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --border: #374151;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 16px; }
+
+    /* Header Nav Bar */
+    .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .nav-btn { 
+      background: #27272a; border: 1px solid var(--border); color: var(--text); 
+      padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; 
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+    }
+    .nav-btn:active { background: #3f3f46; }
+
+    .card { background: var(--card); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    h2 { font-size: 1.1rem; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Switch de Selección (NetPay / Flotillas) */
+    .type-selector { display: flex; gap: 8px; margin-bottom: 16px; }
+    .type-btn { 
+      flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border); 
+      background: #18181b; color: var(--muted); font-weight: bold; cursor: pointer; text-align: center;
+    }
+    .type-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* Acceso Rápido Frecuentes */
+    .frequent-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+    .freq-card { 
+      background: #18181b; border: 1px solid var(--border); border-radius: 8px; 
+      padding: 8px 4px; text-align: center; cursor: pointer; transition: border 0.2s;
+    }
+    .freq-card:active { border-color: var(--accent); background: #27272a; }
+    .freq-title { font-size: 0.8rem; font-weight: bold; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .freq-sub { font-size: 0.7rem; color: var(--muted); }
+
+    .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    label { font-size: 0.85rem; color: var(--muted); }
+    input { 
+      background: #18181b; border: 1px solid var(--border); border-radius: 8px; 
+      padding: 12px; color: #fff; font-size: 1rem; outline: none; transition: border 0.2s;
+    }
+    input:focus { border-color: var(--accent); }
+
+    .btn { 
+      background: var(--accent); color: white; border: none; border-radius: 8px; 
+      padding: 12px; font-weight: bold; cursor: pointer; text-align: center; width: 100%;
+    }
+    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--muted); margin-top: 8px; }
+    .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); margin-top: 16px; }
+
+    /* Modal / Overlay */
+    .overlay { 
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+      background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 100;
+    }
+    .modal { background: var(--card); width: 100%; max-width: 400px; border-radius: 12px; padding: 20px; border: 1px solid var(--border); }
+
+    .client-active-info { font-size: 1.1rem; font-weight: bold; color: var(--accent); margin-bottom: 12px; }
+    
+    /* Tabla Resumen */
+    .summary-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    .summary-table th, .summary-table td { 
+      padding: 10px 6px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; 
+    }
+    .summary-table th { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
+    
+    /* Filas del Pie de Tabla */
+    tfoot tr { background: #18181b; }
+    .subtotal-row td { color: var(--muted); font-size: 0.9rem; border-bottom: 1px dashed var(--border); }
+    .total-row { font-weight: bold; color: var(--success); }
+    .total-row td { border-bottom: none; font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- BARRA SUPERIOR DE NAVEGACIÓN -->
+  <div class="header-nav">
+    <span style="font-weight: bold; color: #fff;">Caja PWA</span>
+    <button class="nav-btn" onclick="irASegundaPagina()">
+      Página 2 ➔
+    </button>
+  </div>
+
+  <!-- SELECTOR DE MODO -->
+  <div class="type-selector">
+    <button class="type-btn active" id="btnNetPay" onclick="seleccionarModo('netpay')">NetPay</button>
+    <button class="type-btn" id="btnFlotillas" onclick="seleccionarModo('flotillas')">Flotillas / Buscar</button>
+  </div>
+
+  <!-- 1. BUSCADOR Y FRECUENTES (MODO FLOTILLAS) -->
+  <div class="card" id="panelBusqueda" style="display: none;">
+    <h2>Búsqueda de Cliente</h2>
+    
+    <!-- Clientes Frecuentes -->
+    <div id="seccionFrecuentes" style="display: none;">
+      <label style="margin-bottom: 6px; display: block;">Clientes Frecuentes</label>
+      <div class="frequent-grid" id="frequentContainer"></div>
+    </div>
+
+    <div class="input-group">
+      <label for="numClienteInput">Número de Cliente</label>
+      <input type="number" id="numClienteInput" placeholder="Ej. 102" onclick="limpiarBuscador()" onkeydown="if(event.key==='Enter') buscarCliente()">
+    </div>
+    <button class="btn" onclick="buscarCliente()">Buscar / Seleccionar</button>
+  </div>
+
+  <!-- 2. PANEL DE IMPORTE -->
+  <div class="card" id="panelImporte">
+    <div class="client-active-info" id="clienteActivoLabel">Cuenta: NetPay</div>
+    <div class="input-group">
+      <label for="importeInput">Importe a sumar ($)</label>
+      <input type="number" step="0.01" id="importeInput" placeholder="0.00" onkeydown="procesarImporte(event)">
+    </div>
+  </div>
+
+  <!-- 3. RESUMEN DE CLIENTES -->
+  <div class="card" id="panelResumen" style="display: none;">
+    <h2>Resumen de Transacciones</h2>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Tx</th>
+          <th>#</th>
+          <th>Cliente</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="resumenTablaBody"></tbody>
+      <tfoot>
+        <!-- Total Flotillas -->
+        <tr class="subtotal-row">
+          <td id="totalTxFlotillas">0</td>
+          <td colspan="2">TOTAL FLOTILLAS</td>
+          <td id="totalMontoFlotillas">$0.00</td>
+        </tr>
+        <!-- Total NetPay -->
+        <tr class="subtotal-row">
+          <td id="totalTxNetPay">0</td>
+          <td colspan="2">TOTAL NETPAY</td>
+          <td id="totalMontoNetPay">$0.00</td>
+        </tr>
+        <!-- Total General -->
+        <tr class="total-row">
+          <td id="totalTxGlobal">0</td>
+          <td colspan="2">TOTAL GENERAL</td>
+          <td id="totalMontoGlobal">$0.00</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <button class="btn btn-danger" onclick="reiniciarTransacciones()">Reiniciar Transacciones del Día</button>
+  </div>
+
+</div>
+
+<!-- MODAL REGISTRO -->
+<div class="overlay" id="modalRegistro">
+  <div class="modal">
+    <h2 style="color: #fff; margin-bottom: 16px;">Cliente no encontrado</h2>
+    <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 16px;">
+      El número <b id="numNoEncontradoTexto"></b> no está registrado. ¿Deseas darlo de alta?
+    </p>
+
+    <div id="formRegistro" style="display: none;">
+      <div class="input-group">
+        <label>Número de Cliente</label>
+        <input type="number" id="regNum" disabled>
+      </div>
+      <div class="input-group">
+        <label>Nombre Completo</label>
+        <input type="text" id="regNombre" placeholder="Ej. Todo Mexico Por Tierra">
+      </div>
+      <div class="input-group">
+        <label>Apodo (Visualización)</label>
+        <input type="text" id="regApodo" placeholder="Ej. TMT">
+      </div>
+      <button class="btn" onclick="guardarCliente()">Guardar y Seleccionar</button>
+    </div>
+
+    <div id="opcionesIniciales">
+      <button class="btn" onclick="mostrarFormularioRegistro()">Registrar</button>
+      <button class="btn btn-secondary" onclick="omitirRegistro()">Omitir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let clientes = JSON.parse(localStorage.getItem('caja_clientes')) || [];
+  
+  // Cliente NetPay
+  let clienteNetPay = { num: 0, nombre: "Cuenta NetPay", apodo: "NetPay", transacciones: 0, total: 0.00, esNetPay: true };
+  const netPayGuardado = JSON.parse(localStorage.getItem('caja_netpay'));
+  if (netPayGuardado) clienteNetPay = netPayGuardado;
+
+  let clienteSeleccionado = clienteNetPay;
+  let modoActual = 'netpay';
+
+  renderFrecuentes();
+  actualizarResumenUI();
+  document.getElementById('importeInput').focus();
+
+  // Función de navegación a la segunda página
+  function irASegundaPagina() {
+    alert("Navegando a la Página 2...");
+    // Aquí integraremos la lógica de la vista secundaria que me indiques
+  }
+
+  function seleccionarModo(modo) {
+    modoActual = modo;
+    const btnNetPay = document.getElementById('btnNetPay');
+    const btnFlotillas = document.getElementById('btnFlotillas');
+    const panelBusqueda = document.getElementById('panelBusqueda');
+
+    if (modo === 'netpay') {
+      btnNetPay.classList.add('active');
+      btnFlotillas.classList.remove('active');
+      panelBusqueda.style.display = 'none';
+      
+      clienteSeleccionado = clienteNetPay;
+      document.getElementById('clienteActivoLabel').innerText = `Cuenta: NetPay`;
+    } else {
+      btnFlotillas.classList.add('active');
+      btnNetPay.classList.remove('active');
+      panelBusqueda.style.display = 'block';
+      
+      document.getElementById('clienteActivoLabel').innerText = `Selecciona un cliente...`;
+      clienteSeleccionado = null;
+      renderFrecuentes();
+    }
+
+    const input = document.getElementById('importeInput');
+    input.value = '';
+    input.focus();
+  }
+
+  function limpiarBuscador() {
+    document.getElementById('numClienteInput').value = '';
+  }
+
+  function guardarEnLocalStorage() {
+    localStorage.setItem('caja_clientes', JSON.stringify(clientes));
+    localStorage.setItem('caja_netpay', JSON.stringify(clienteNetPay));
+  }
+
+  function buscarCliente() {
+    const numInput = document.getElementById('numClienteInput');
+    const valor = parseInt(numInput.value);
+
+    if (isNaN(valor)) return;
+
+    const encontrado = clientes.find(c => c.num === valor);
+
+    if (encontrado) {
+      seleccionarCliente(encontrado);
+    } else {
+      document.getElementById('numNoEncontradoTexto').innerText = valor;
+      document.getElementById('regNum').value = valor;
+      document.getElementById('modalRegistro').style.display = 'flex';
+      document.getElementById('opcionesIniciales').style.display = 'block';
+      document.getElementById('formRegistro').style.display = 'none';
+    }
+  }
+
+  function renderFrecuentes() {
+    const container = document.getElementById('frequentContainer');
+    const seccion = document.getElementById('seccionFrecuentes');
+    container.innerHTML = '';
+
+    const frecuentes = [...clientes]
+      .filter(c => !c.esNetPay)
+      .sort((a, b) => b.transacciones - a.transacciones)
+      .slice(0, 8);
+
+    if (frecuentes.length > 0) {
+      seccion.style.display = 'block';
+      frecuentes.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'freq-card';
+        div.onclick = () => seleccionarCliente(c);
+        div.innerHTML = `
+          <div class="freq-title">${c.apodo}</div>
+          <div class="freq-sub">#${c.num}</div>
+        `;
+        container.appendChild(div);
+      });
+    } else {
+      seccion.style.display = 'none';
+    }
+  }
+
+  function mostrarFormularioRegistro() {
+    document.getElementById('opcionesIniciales').style.display = 'none';
+    document.getElementById('formRegistro').style.display = 'block';
+    document.getElementById('regNombre').focus();
+  }
+
+  function cerrarModal() {
+    document.getElementById('modalRegistro').style.display = 'none';
+  }
+
+  function omitirRegistro() {
+    const num = parseInt(document.getElementById('regNum').value);
+
+    let clienteSinRegistro = {
+      num: num,
+      nombre: `Cliente #${num}`,
+      apodo: `#${num}`,
+      transacciones: 0,
+      total: 0.00
+    };
+
+    clientes.push(clienteSinRegistro);
+    guardarEnLocalStorage();
+    cerrarModal();
+    seleccionarCliente(clienteSinRegistro);
+  }
+
+  function guardarCliente() {
+    const num = parseInt(document.getElementById('regNum').value);
+    const nombre = document.getElementById('regNombre').value.trim();
+    const apodo = document.getElementById('regApodo').value.trim();
+
+    if (!nombre || !apodo) {
+      alert("Por favor llena todos los campos.");
+      return;
+    }
+
+    const nuevoCliente = {
+      num: num,
+      nombre: nombre,
+      apodo: apodo,
+      transacciones: 0,
+      total: 0.00
+    };
+
+    clientes.push(nuevoCliente);
+    guardarEnLocalStorage();
+    cerrarModal();
+    seleccionarCliente(nuevoCliente);
+
+    document.getElementById('regNombre').value = '';
+    document.getElementById('regApodo').value = '';
+  }
+
+  function seleccionarCliente(cliente) {
+    clienteSeleccionado = cliente;
+    document.getElementById('clienteActivoLabel').innerText = `Cliente: ${cliente.apodo} (#${cliente.num})`;
+
+    const inputImporte = document.getElementById('importeInput');
+    inputImporte.value = '';
+    inputImporte.focus();
+  }
+
+  function procesarImporte(event) {
+    if (event.key === 'Enter') {
+      const input = document.getElementById('importeInput');
+      const val = parseFloat(input.value);
+
+      if (!isNaN(val) && val > 0 && clienteSeleccionado) {
+        clienteSeleccionado.transacciones += 1;
+        clienteSeleccionado.total += val;
+        
+        guardarEnLocalStorage();
+        renderFrecuentes();
+        actualizarResumenUI();
+        
+        input.value = '';
+      } else {
+        input.blur();
+      }
+    }
+  }
+
+  function actualizarResumenUI() {
+    const tbody = document.getElementById('resumenTablaBody');
+    tbody.innerHTML = '';
+
+    let listaResumen = [];
+    if (clienteNetPay.transacciones > 0) listaResumen.push(clienteNetPay);
+    
+    const clientesFlotillasConTx = clientes.filter(c => c.transacciones > 0);
+    listaResumen = listaResumen.concat(clientesFlotillasConTx);
+
+    const fmt = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+    if (listaResumen.length > 0) {
+      document.getElementById('panelResumen').style.display = 'block';
+
+      listaResumen.forEach(c => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${c.transacciones}</td>
+          <td><b>${c.esNetPay ? '-' : c.num}</b></td>
+          <td>${c.apodo}</td>
+          <td>${fmt.format(c.total)}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      const txFlotillas = clientesFlotillasConTx.reduce((sum, c) => sum + c.transacciones, 0);
+      const montoFlotillas = clientesFlotillasConTx.reduce((sum, c) => sum + c.total, 0);
+
+      const txNetPay = clienteNetPay.transacciones;
+      const montoNetPay = clienteNetPay.total;
+
+      const txGlobal = txFlotillas + txNetPay;
+      const montoGlobal = montoFlotillas + montoNetPay;
+
+      document.getElementById('totalTxFlotillas').innerText = txFlotillas;
+      document.getElementById('totalMontoFlotillas').innerText = fmt.format(montoFlotillas);
+
+      document.getElementById('totalTxNetPay').innerText = txNetPay;
+      document.getElementById('totalMontoNetPay').innerText = fmt.format(montoNetPay);
+
+      document.getElementById('totalTxGlobal').innerText = txGlobal;
+      document.getElementById('totalMontoGlobal').innerText = fmt.format(montoGlobal);
+
+    } else {
+      document.getElementById('panelResumen').style.display = 'none';
+    }
+  }
+
+  function reiniciarTransacciones() {
+    if (confirm("¿Seguro que deseas reiniciar las transacciones a $0.00? Se conservarán los nombres de los clientes.")) {
+      clienteNetPay.transacciones = 0;
+      clienteNetPay.total = 0.00;
+
+      clientes.forEach(c => {
+        c.transacciones = 0;
+        c.total = 0.00;
+      });
+
+      guardarEnLocalStorage();
+      renderFrecuentes();
+      actualizarResumenUI();
+      
+      seleccionarModo('netpay');
+    }
+  }
+</script>
+
+</body>
+</html>
