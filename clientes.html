@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Cortex - Clientes</title>
+
+<style>
+*{box-sizing:border-box}
+
+:root{
+  --bg:#f5f7fa;
+  --card:#fff;
+  --text:#172033;
+  --muted:#667085;
+  --border:#e4e7ec;
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --danger:#dc2626;
+  --danger-bg:#fef2f2;
+  --shadow:0 8px 24px rgba(16,24,40,.07);
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+}
+
+.logo{
+  color:inherit;
+  text-decoration:none;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-1px;
+}
+
+.logo span{font-weight:400}
+
+.turn-badge{
+  font-size:13px;
+  font-weight:700;
+  color:var(--primary);
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  border-radius:999px;
+  padding:7px 11px;
+}
+
+main{
+  width:min(100%,900px);
+  margin:0 auto;
+  padding:18px 14px 40px;
+}
+
+.page-title{
+  font-size:25px;
+  margin:0 0 4px;
+}
+
+.subtitle{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:18px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+
+.toolbar{
+  display:flex;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.search-wrap{
+  flex:1;
+  position:relative;
+}
+
+.search-wrap input{
+  padding-left:40px;
+}
+
+.search-icon{
+  position:absolute;
+  left:13px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--muted);
+  pointer-events:none;
+}
+
+input{
+  width:100%;
+  border:1px solid #d0d5dd;
+  border-radius:10px;
+  padding:11px 10px;
+  font-size:16px;
+  background:#fff;
+  color:var(--text);
+  outline:none;
+}
+
+input:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(37,99,235,.1);
+}
+
+button{
+  border:0;
+  border-radius:11px;
+  padding:11px 14px;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.btn-primary{
+  background:var(--primary);
+  color:#fff;
+}
+
+.btn-primary:active{
+  background:var(--primary-dark);
+}
+
+.btn-secondary{
+  background:#eef2f6;
+  color:#344054;
+}
+
+.btn-danger{
+  background:var(--danger-bg);
+  color:var(--danger);
+}
+
+.count{
+  color:var(--muted);
+  font-size:13px;
+  margin:2px 0 12px;
+}
+
+.client-list{
+  display:grid;
+  gap:10px;
+}
+
+.client{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  background:#fff;
+}
+
+.client-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.client-number{
+  font-size:18px;
+  font-weight:800;
+}
+
+.client-name{
+  font-size:16px;
+  font-weight:700;
+  margin-top:4px;
+}
+
+.client-alias{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:5px;
+}
+
+.client-actions{
+  display:flex;
+  gap:7px;
+  flex-shrink:0;
+}
+
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:28px 10px;
+}
+
+.notice{
+  background:#fffbeb;
+  border:1px solid #fde68a;
+  color:#92400e;
+  border-radius:12px;
+  padding:12px;
+  font-size:13px;
+  margin-bottom:14px;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* Modal */
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background:rgba(16,24,40,.48);
+}
+
+.modal{
+  width:min(100%,460px);
+  max-height:calc(100vh - 32px);
+  overflow:auto;
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 20px 60px rgba(0,0,0,.2);
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:17px 17px 12px;
+  border-bottom:1px solid var(--border);
+}
+
+.modal-header h2{
+  margin:0;
+  font-size:20px;
+}
+
+.close{
+  width:38px;
+  height:38px;
+  padding:0;
+  border-radius:50%;
+  background:#f2f4f7;
+  color:#344054;
+  font-size:21px;
+}
+
+.modal-body{
+  padding:16px 17px;
+}
+
+.field{
+  margin-bottom:13px;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.field-help{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:5px;
+}
+
+.modal-footer{
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+  padding:12px 17px 17px;
+  border-top:1px solid var(--border);
+}
+
+.confirm-text{
+  color:var(--muted);
+  line-height:1.45;
+  font-size:14px;
+}
+
+.confirm-client{
+  margin:14px 0;
+  padding:12px;
+  background:#f8fafc;
+  border-radius:11px;
+}
+
+.confirm-client strong{
+  display:block;
+  margin-bottom:3px;
+}
+
+@media(max-width:560px){
+  main{
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .topbar{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .logo{
+    font-size:25px;
+  }
+
+  .toolbar{
+    flex-direction:column;
+  }
+
+  .toolbar .btn-primary{
+    width:100%;
+  }
+
+  .client-top{
+    flex-direction:column;
+  }
+
+  .client-actions{
+    width:100%;
+  }
+
+  .client-actions button{
+    flex:1;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="logo" aria-label="Ir al inicio">
+    Cor<span>tex</span>
+  </a>
+
+  <div id="turnBadge" class="turn-badge">
+    Turno activo
+  </div>
+</header>
+
+<main>
+  <h1 class="page-title">Clientes</h1>
+  <div id="subtitle" class="subtitle">
+    Directorio permanente de clientes
+  </div>
+
+  <div id="noTurnNotice" class="notice hidden">
+    No hay un turno activo. Regresando al inicio...
+  </div>
+
+  <section id="content" class="hidden">
+
+    <div class="card">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Buscar por número, nombre o apodo..."
+            autocomplete="off"
+            oninput="filtrarClientes()"
+          >
+        </div>
+
+        <button
+          class="btn-primary"
+          type="button"
+          onclick="abrirNuevoCliente()"
+        >
+          + Nuevo cliente
+        </button>
+      </div>
+
+      <div id="count" class="count">
+        0 clientes
+      </div>
+
+      <div id="clientList" class="client-list"></div>
+    </div>
+
+  </section>
+</main>
+
+<!-- Modal cliente -->
+<div id="clientModal" class="modal-backdrop hidden">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+    <div class="modal-header">
+      <h2 id="modalTitle">Nuevo cliente</h2>
+
+      <button
+        class="close"
+        type="button"
+        aria-label="Cerrar"
+        onclick="cerrarModal()"
+      >
+        ×
+      </button>
+    </div>
+
+    <form id="clientForm" onsubmit="guardarCliente(event)">
+      <div class="modal-body">
+
+        <div class="field">
+          <label for="numeroCliente">Número de cliente</label>
+          <input
+            id="numeroCliente"
+            type="number"
+            min="0"
+            step="1"
+            inputmode="numeric"
+            autocomplete="off"
+            required
+          >
+          <div class="field-help">
+            El número identifica al cliente en Caja.
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="nombreCliente">Nombre</label>
+          <input
+            id="nombreCliente"
+            type="text"
+            maxlength="100"
+            autocomplete="name"
+            required
+          >
+        </div>
+
+        <div class="field">
+          <label for="apodoCliente">Apodo</label>
+          <input
+            id="apodoCliente"
+            type="text"
+            maxlength="60"
+            autocomplete="off"
+            placeholder="Opcional"
+          >
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button
+          class="btn-secondary"
+          type="button"
+          onclick="cerrarModal()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          id="saveClientButton"
+          class="btn-primary"
+          type="submit"
+        >
+          Guardar cliente
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<!-- Modal eliminación -->
+<div id="deleteModal" class="modal-backdrop hidden">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+
+    <div class="modal-header">
+      <h2 id="deleteTitle">Eliminar cliente</h2>
+
+      <button
+        class="close"
+        type="button"
+        aria-label="Cerrar"
+        onclick="cerrarEliminar()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="confirm-text">
+        ¿Seguro que deseas eliminar este cliente?
+        Esta acción no se puede deshacer.
+      </div>
+
+      <div id="deleteClientInfo" class="confirm-client"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        class="btn-secondary"
+        type="button"
+        onclick="cerrarEliminar()"
+      >
+        Cancelar
+      </button>
+
+      <button
+        class="btn-danger"
+        type="button"
+        onclick="confirmarEliminar()"
+      >
+        Eliminar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/*
+ * ============================================================
+ * CORTEX - CLIENTES
+ *
+ * Persistencia oficial:
+ *
+ * localStorage["cortex"]
+ *
+ * Los clientes son permanentes:
+ *
+ * estado.config.clientes
+ *
+ * NO se almacenan dentro de turnData y por lo tanto NO se
+ * eliminan al cerrar el turno.
+ * ============================================================
+ */
+
+const STORAGE_KEY = "cortex";
+
+let estado = null;
+let clientes = [];
+let clienteEditandoId = null;
+let clienteEliminandoId = null;
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+
+function obtenerEstado() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+
+  if (!raw) {
+    return {
+      version: 1,
+      config: {
+        precios: {
+          magna: 0,
+          premium: 0,
+          diesel: 0
+        },
+        islandPresets: {
+          "0": [1,2,3,4,5,6,7,8],
+          "1": [1,2],
+          "2": [3,4],
+          "3": [3,4,5],
+          "4": [1,2,3,4,5,6,7,8],
+          "5": [1,2,3,4,5,6,7,8],
+          "6": [1,2,3,4,5,6,7,8],
+          "7": [1,2,3,4,5,6,7,8],
+          "8": [1,2,3,4,5,6,7,8],
+          "9": [1,2,3,4,5,6,7,8]
+        },
+        clientes: []
+      },
+      activeTurn: null,
+      turnData: null,
+      lastTurnFinalReadings: null
+    };
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch(error) {
+    console.error("Error leyendo Cortex:", error);
+    return null;
+  }
+}
+
+function guardarEstado() {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(estado)
+  );
+}
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function normalizarTexto(value) {
+  return String(value ?? "")
+    .trim()
+    .toLocaleLowerCase("es-MX");
+}
+
+function normalizarNumero(value) {
+  const n = Number(value);
+
+  if (!Number.isFinite(n)) {
+    return null;
+  }
+
+  return Math.trunc(n);
+}
+
+/* ============================================================
+   TURNO
+   ============================================================ */
+
+function hayTurnoActivo() {
+  return !!(
+    estado &&
+    estado.activeTurn &&
+    typeof estado.activeTurn === "object"
+  );
+}
+
+function mostrarTurno() {
+  const turno = estado.activeTurn;
+
+  const numeroTurno =
+    turno.turno ??
+    turno.numero ??
+    "";
+
+  const isla =
+    turno.isla ??
+    turno.islaSeleccionada ??
+    "";
+
+  let texto = "Turno activo";
+
+  if (numeroTurno !== "") {
+    texto += " · Turno " +
+      escapeHtml(numeroTurno);
+  }
+
+  if (isla !== "") {
+    texto += " · Isla " +
+      escapeHtml(isla);
+  }
+
+  document.getElementById("turnBadge").innerHTML =
+    texto;
+
+  document.getElementById("subtitle").textContent =
+    "Directorio permanente de clientes";
+}
+
+/* ============================================================
+   CLIENTES
+   ============================================================ */
+
+function cargarClientes() {
+  estado.config = estado.config || {};
+
+  if (!Array.isArray(estado.config.clientes)) {
+    estado.config.clientes = [];
+  }
+
+  clientes = estado.config.clientes;
+}
+
+function guardarClientes() {
+  estado.config = estado.config || {};
+
+  estado.config.clientes = clientes;
+
+  guardarEstado();
+}
+
+function ordenarClientes() {
+  clientes.sort((a, b) => {
+    const na = Number(a.numeroCliente);
+    const nb = Number(b.numeroCliente);
+
+    if (Number.isFinite(na) && Number.isFinite(nb)) {
+      return na - nb;
+    }
+
+    return String(a.numeroCliente)
+      .localeCompare(
+        String(b.numeroCliente),
+        "es-MX"
+      );
+  });
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+
+function renderClientes(lista = clientes) {
+  const container =
+    document.getElementById("clientList");
+
+  const count =
+    document.getElementById("count");
+
+  count.textContent =
+    lista.length +
+    (lista.length === 1
+      ? " cliente"
+      : " clientes");
+
+  if (!lista.length) {
+    const buscando =
+      document.getElementById("searchInput")
+        .value.trim();
+
+    container.innerHTML = buscando
+      ? `<div class="empty">
+           No se encontraron clientes para
+           <strong>${escapeHtml(buscando)}</strong>.
+         </div>`
+      : `<div class="empty">
+           Aún no hay clientes registrados.
+         </div>`;
+
+    return;
+  }
+
+  container.innerHTML = lista.map(cliente => `
+    <article class="client">
+      <div class="client-top">
+
+        <div>
+          <div class="client-number">
+            #${escapeHtml(cliente.numeroCliente)}
+          </div>
+
+          <div class="client-name">
+            ${escapeHtml(cliente.nombre)}
+          </div>
+
+          ${
+            cliente.apodo
+              ? `<div class="client-alias">
+                   Apodo: ${escapeHtml(cliente.apodo)}
+                 </div>`
+              : `<div class="client-alias">
+                   Sin apodo registrado
+                 </div>`
+          }
+        </div>
+
+        <div class="client-actions">
+          <button
+            class="btn-secondary"
+            type="button"
+            onclick="abrirEditarCliente(${Number(cliente.id)})"
+          >
+            Editar
+          </button>
+
+          <button
+            class="btn-danger"
+            type="button"
+            onclick="abrirEliminar(${Number(cliente.id)})"
+          >
+            Eliminar
+          </button>
+        </div>
+
+      </div>
+    </article>
+  `).join("");
+}
+
+/* ============================================================
+   BUSCADOR
+   ============================================================ */
+
+function filtrarClientes() {
+  const termino =
+    normalizarTexto(
+      document.getElementById("searchInput").value
+    );
+
+  if (!termino) {
+    renderClientes(clientes);
+    return;
+  }
+
+  const resultados = clientes.filter(cliente => {
+    const numero =
+      normalizarTexto(cliente.numeroCliente);
+
+    const nombre =
+      normalizarTexto(cliente.nombre);
+
+    const apodo =
+      normalizarTexto(cliente.apodo);
+
+    return (
+      numero.includes(termino) ||
+      nombre.includes(termino) ||
+      apodo.includes(termino)
+    );
+  });
+
+  renderClientes(resultados);
+}
+
+/* ============================================================
+   NUEVO / EDITAR
+   ============================================================ */
+
+function abrirNuevoCliente() {
+  clienteEditandoId = null;
+
+  document.getElementById("modalTitle").textContent =
+    "Nuevo cliente";
+
+  document.getElementById("saveClientButton")
+    .textContent = "Guardar cliente";
+
+  document.getElementById("clientForm").reset();
+
+  document.getElementById("clientModal")
+    .classList.remove("hidden");
+
+  setTimeout(() => {
+    document.getElementById("numeroCliente").focus();
+  }, 50);
+}
+
+function abrirEditarCliente(id) {
+  const cliente =
+    clientes.find(c => Number(c.id) === Number(id));
+
+  if (!cliente) return;
+
+  clienteEditandoId = Number(id);
+
+  document.getElementById("modalTitle").textContent =
+    "Editar cliente";
+
+  document.getElementById("saveClientButton")
+    .textContent = "Guardar cambios";
+
+  document.getElementById("numeroCliente").value =
+    cliente.numeroCliente;
+
+  document.getElementById("nombreCliente").value =
+    cliente.nombre || "";
+
+  document.getElementById("apodoCliente").value =
+    cliente.apodo || "";
+
+  document.getElementById("clientModal")
+    .classList.remove("hidden");
+
+  setTimeout(() => {
+    document.getElementById("numeroCliente").focus();
+  }, 50);
+}
+
+function cerrarModal() {
+  document.getElementById("clientModal")
+    .classList.add("hidden");
+
+  clienteEditandoId = null;
+
+  document.getElementById("clientForm").reset();
+}
+
+/* ============================================================
+   GUARDAR CLIENTE
+   ============================================================ */
+
+function guardarCliente(event) {
+  event.preventDefault();
+
+  const numeroCliente =
+    normalizarNumero(
+      document.getElementById("numeroCliente").value
+    );
+
+  const nombre =
+    document.getElementById("nombreCliente")
+      .value.trim();
+
+  const apodo =
+    document.getElementById("apodoCliente")
+      .value.trim();
+
+  if (
+    numeroCliente === null ||
+    numeroCliente < 0
+  ) {
+    alert("Ingresa un número de cliente válido.");
+    return;
+  }
+
+  if (!nombre) {
+    alert("Ingresa el nombre del cliente.");
+    return;
+  }
+
+  /*
+   * El número de cliente debe ser único.
+   */
+  const duplicado = clientes.find(cliente => {
+    const mismoNumero =
+      Number(cliente.numeroCliente) ===
+      numeroCliente;
+
+    const esMismoCliente =
+      clienteEditandoId !== null &&
+      Number(cliente.id) ===
+      Number(clienteEditandoId);
+
+    return mismoNumero && !esMismoCliente;
+  });
+
+  if (duplicado) {
+    alert(
+      "Ya existe un cliente registrado con el número " +
+      numeroCliente +
+      "."
+    );
+    return;
+  }
+
+  if (clienteEditandoId !== null) {
+    const index =
+      clientes.findIndex(
+        cliente =>
+          Number(cliente.id) ===
+          Number(clienteEditandoId)
+      );
+
+    if (index === -1) {
+      alert("No se encontró el cliente.");
+      cerrarModal();
+      return;
+    }
+
+    clientes[index] = {
+      ...clientes[index],
+      numeroCliente,
+      nombre,
+      apodo
+    };
+
+  } else {
+    clientes.push({
+      id: Date.now(),
+      numeroCliente,
+      nombre,
+      apodo
+    });
+  }
+
+  ordenarClientes();
+  guardarClientes();
+  cerrarModal();
+  renderClientes();
+}
+
+/* ============================================================
+   ELIMINAR
+   ============================================================ */
+
+function abrirEliminar(id) {
+  const cliente =
+    clientes.find(c =>
+      Number(c.id) === Number(id)
+    );
+
+  if (!cliente) return;
+
+  clienteEliminandoId = Number(id);
+
+  document.getElementById("deleteClientInfo")
+    .innerHTML = `
+      <strong>
+        #${escapeHtml(cliente.numeroCliente)}
+      </strong>
+      <div>
+        ${escapeHtml(cliente.nombre)}
+      </div>
+      ${
+        cliente.apodo
+          ? `<div class="client-alias">
+               Apodo: ${escapeHtml(cliente.apodo)}
+             </div>`
+          : ""
+      }
+    `;
+
+  document.getElementById("deleteModal")
+    .classList.remove("hidden");
+}
+
+function cerrarEliminar() {
+  document.getElementById("deleteModal")
+    .classList.add("hidden");
+
+  clienteEliminandoId = null;
+}
+
+function confirmarEliminar() {
+  if (clienteEliminandoId === null) {
+    cerrarEliminar();
+    return;
+  }
+
+  const index =
+    clientes.findIndex(
+      cliente =>
+        Number(cliente.id) ===
+        Number(clienteEliminandoId)
+    );
+
+  if (index === -1) {
+    cerrarEliminar();
+    return;
+  }
+
+  clientes.splice(index, 1);
+
+  guardarClientes();
+  cerrarEliminar();
+  renderClientes();
+}
+
+/* ============================================================
+   MODALES / TECLADO
+   ============================================================ */
+
+document.addEventListener("keydown", event => {
+  if (event.key !== "Escape") return;
+
+  if (
+    !document.getElementById("clientModal")
+      .classList.contains("hidden")
+  ) {
+    cerrarModal();
+    return;
+  }
+
+  if (
+    !document.getElementById("deleteModal")
+      .classList.contains("hidden")
+  ) {
+    cerrarEliminar();
+  }
+});
+
+document.getElementById("clientModal")
+  .addEventListener("click", event => {
+    if (event.target.id === "clientModal") {
+      cerrarModal();
+    }
+  });
+
+document.getElementById("deleteModal")
+  .addEventListener("click", event => {
+    if (event.target.id === "deleteModal") {
+      cerrarEliminar();
+    }
+  });
+
+/* ============================================================
+   INICIO
+   ============================================================ */
+
+function iniciarClientes() {
+  estado = obtenerEstado();
+
+  /*
+   * Igual que Caja y Lecturas:
+   * Clientes requiere un turno activo para entrar desde
+   * la navegación de la aplicación.
+   *
+   * Los datos de clientes, sin embargo, son permanentes.
+   */
+  if (!hayTurnoActivo()) {
+    document.getElementById("noTurnNotice")
+      .classList.remove("hidden");
+
+    setTimeout(() => {
+      window.location.replace("index.html");
+    }, 900);
+
+    return;
+  }
+
+  document.getElementById("content")
+    .classList.remove("hidden");
+
+  cargarClientes();
+  ordenarClientes();
+  mostrarTurno();
+  renderClientes();
+}
+
+window.addEventListener("storage", () => {
+  estado = obtenerEstado();
+
+  if (!hayTurnoActivo()) {
+    window.location.replace("index.html");
+    return;
+  }
+
+  cargarClientes();
+  ordenarClientes();
+  filtrarClientes();
+});
+
+document.addEventListener(
+  "DOMContentLoaded",
+  iniciarClientes
+);
+</script>
+
+</body>
+</html>

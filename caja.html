@@ -1,0 +1,4832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
+    <meta
+        name="theme-color"
+        content="#ffffff"
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="default"
+    >
+
+    <title>Cortex - Caja</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+
+        :root {
+
+            --blue: #2196f3;
+            --blue-dark: #1976d2;
+            --blue-light: #e3f2fd;
+
+            --green: #21a321;
+            --red: #e3262e;
+            --orange: #ff9800;
+
+            --bg: #f1f4f5;
+            --card: #ffffff;
+            --input: #e7eaee;
+
+            --text: #111111;
+            --muted: #7c8798;
+
+            --shadow:
+                0 4px 12px rgba(0, 0, 0, 0.10);
+
+            --radius: 20px;
+        }
+
+
+        html,
+        body {
+
+            margin: 0;
+            padding: 0;
+
+            min-height: 100%;
+            width: 100%;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: var(--bg);
+            color: var(--text);
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            padding-bottom: 90px;
+        }
+
+
+        button,
+        input {
+
+            font: inherit;
+        }
+
+
+        button {
+
+            border: none;
+            cursor: pointer;
+        }
+
+
+        /* =========================================
+           HEADER
+        ========================================== */
+
+        .topbar {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 20;
+
+            height: 70px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 18px;
+
+            background:
+                rgba(255, 255, 255, 0.97);
+
+            border-bottom:
+                1px solid rgba(0, 0, 0, 0.05);
+        }
+
+
+        .logo {
+
+            font-size: 28px;
+
+            font-weight: 800;
+
+            letter-spacing: -1px;
+        }
+
+
+        .logo span {
+
+            color: var(--blue);
+        }
+
+
+        .turn-badge {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding: 8px 12px;
+
+            border-radius: 999px;
+
+            background: #e8f5e9;
+
+            color: #18851d;
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+
+        .turn-dot {
+
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: #22a62a;
+        }
+
+
+        /* =========================================
+           MAIN
+        ========================================== */
+
+        main {
+
+            width: 100%;
+
+            max-width: 700px;
+
+            margin: 0 auto;
+
+            padding:
+                18px 14px 30px;
+        }
+
+
+        /* =========================================
+           CAPTURA
+        ========================================== */
+
+        .capture-card {
+
+            background: var(--card);
+
+            border-radius:
+                0 0 30px 30px;
+
+            box-shadow: var(--shadow);
+
+            padding: 15px;
+
+            margin:
+                -18px -14px 18px;
+        }
+
+
+        .capture-title {
+
+            font-size: 21px;
+
+            font-weight: 700;
+
+            margin-bottom: 12px;
+        }
+
+
+        .amount-row {
+
+            display: grid;
+
+            grid-template-columns: 1fr;
+
+            gap: 10px;
+        }
+
+
+        .amount-input {
+
+            width: 100%;
+
+            height: 64px;
+
+            border: none;
+
+            outline: none;
+
+            border-radius: 15px;
+
+            background: var(--input);
+
+            padding: 0 18px;
+
+            font-size: 27px;
+
+            font-weight: 700;
+
+            color: var(--text);
+        }
+
+
+        .amount-input::placeholder {
+
+            color: #8a94a6;
+
+            font-weight: 400;
+        }
+
+
+        .amount-input:focus {
+
+            box-shadow:
+                0 0 0 2px
+                rgba(33, 150, 243, 0.25);
+        }
+
+
+        .client-input-row {
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr);
+
+            gap: 7px;
+        }
+
+
+        .client-main-input {
+
+            width: 100%;
+
+            height: 54px;
+
+            border: none;
+
+            outline: none;
+
+            border-radius: 15px;
+
+            background: var(--input);
+
+            padding: 0 16px;
+
+            font-size: 20px;
+
+            font-weight: 700;
+        }
+
+
+        .client-main-input::placeholder {
+
+            color: #8a94a6;
+
+            font-weight: 400;
+        }
+
+
+        .client-main-input:focus {
+
+            box-shadow:
+                0 0 0 2px
+                rgba(33, 150, 243, 0.25);
+        }
+
+
+        .client-main-status {
+
+            min-height: 20px;
+
+            padding-left: 4px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+
+        .capture-buttons {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px;
+        }
+
+
+        .capture-button {
+
+            min-height: 58px;
+
+            border-radius: 15px;
+
+            font-size: 17px;
+
+            font-weight: 700;
+
+            color: white;
+        }
+
+
+        .netpay-button {
+
+            background: var(--blue);
+        }
+
+
+        .flotilla-button {
+
+            background: #111111;
+        }
+
+
+        .capture-button:active {
+
+            transform: scale(0.98);
+        }
+
+
+        /* =========================================
+           FRECUENTES
+        ========================================== */
+
+        .frequent-section {
+
+            margin-bottom: 18px;
+        }
+
+
+        .section-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 10px;
+        }
+
+
+        .section-title {
+
+            font-size: 20px;
+
+            font-weight: 700;
+        }
+
+
+        .section-action {
+
+            background: transparent;
+
+            color: var(--blue);
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+
+        .frequent-list {
+
+            display: flex;
+
+            gap: 9px;
+
+            overflow-x: auto;
+
+            padding:
+                3px 2px 7px;
+        }
+
+
+        .frequent-list::-webkit-scrollbar {
+
+            display: none;
+        }
+
+
+        .frequent-card {
+
+            flex: 0 0 145px;
+
+            padding: 13px;
+
+            background: var(--card);
+
+            border-radius: 15px;
+
+            box-shadow: var(--shadow);
+        }
+
+
+        .frequent-number {
+
+            font-size: 17px;
+
+            font-weight: 800;
+        }
+
+
+        .frequent-nickname {
+
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        .frequent-total {
+
+            margin-top: 9px;
+
+            color: var(--blue-dark);
+
+            font-size: 16px;
+
+            font-weight: 800;
+        }
+
+
+        .frequent-count {
+
+            margin-top: 2px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+
+        .empty-message {
+
+            width: 100%;
+
+            padding: 18px;
+
+            background: var(--card);
+
+            border-radius: 15px;
+
+            color: var(--muted);
+
+            text-align: center;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================================
+           TRANSACTIONS
+        ========================================== */
+
+        .transactions-section {
+
+            margin-bottom: 18px;
+        }
+
+
+        .transactions-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+        }
+
+
+        .transaction {
+
+            display: grid;
+
+            grid-template-columns:
+                48px 1fr auto;
+
+            align-items: center;
+
+            gap: 11px;
+
+            background: var(--card);
+
+            border-radius: 18px;
+
+            box-shadow: var(--shadow);
+
+            padding: 13px;
+        }
+
+
+        .transaction-icon {
+
+            width: 44px;
+            height: 44px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 13px;
+
+            font-size: 21px;
+
+            font-weight: 800;
+        }
+
+
+        .transaction-icon.netpay {
+
+            background:
+                var(--blue-light);
+
+            color: var(--blue);
+        }
+
+
+        .transaction-icon.flotilla {
+
+            background: #eeeeee;
+
+            color: #111111;
+        }
+
+
+        .transaction-info {
+
+            min-width: 0;
+        }
+
+
+        .transaction-type {
+
+            font-size: 16px;
+
+            font-weight: 800;
+        }
+
+
+        .transaction-client {
+
+            margin-top: 3px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        .transaction-time {
+
+            margin-top: 2px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+
+        .transaction-right {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: flex-end;
+
+            gap: 6px;
+        }
+
+
+        .transaction-amount {
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+            white-space: nowrap;
+        }
+
+
+        .transaction-actions {
+
+            display: flex;
+
+            gap: 5px;
+        }
+
+
+        .small-action {
+
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background: var(--input);
+
+            font-size: 14px;
+        }
+
+
+        .small-action.delete {
+
+            color: var(--red);
+        }
+
+
+        /* =========================================
+           RESUMEN DEL TURNO
+        ========================================== */
+
+        .summary-card {
+
+            background: var(--card);
+
+            border-radius: var(--radius);
+
+            box-shadow: var(--shadow);
+
+            padding: 17px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .summary-title {
+
+            margin-bottom: 15px;
+
+            font-size: 21px;
+
+            font-weight: 700;
+        }
+
+
+        .summary-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 9px;
+        }
+
+
+        .summary-item {
+
+            min-width: 0;
+
+            padding: 13px 8px;
+
+            text-align: center;
+
+            background: var(--input);
+
+            border-radius: 14px;
+        }
+
+
+        .summary-label {
+
+            margin-bottom: 6px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        .summary-value {
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+            word-break: break-word;
+        }
+
+
+        .summary-total {
+
+            margin-top: 10px;
+
+            padding: 16px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 10px;
+
+            border-radius: 15px;
+
+            background:
+                var(--blue-light);
+
+            color:
+                var(--blue-dark);
+        }
+
+
+        .summary-total-label {
+
+            font-size: 16px;
+
+            font-weight: 700;
+        }
+
+
+        .summary-total-value {
+
+            font-size: 24px;
+
+            font-weight: 800;
+        }
+
+
+        /* =========================================
+           MODALES
+        ========================================== */
+
+        .modal-overlay {
+
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 100;
+
+            display: none;
+
+            align-items: flex-end;
+
+            justify-content: center;
+
+            background:
+                rgba(0, 0, 0, 0.55);
+        }
+
+
+        .modal-overlay.visible {
+
+            display: flex;
+        }
+
+
+        .modal {
+
+            width: 100%;
+
+            max-width: 650px;
+
+            max-height: 92vh;
+
+            overflow-y: auto;
+
+            background: white;
+
+            border-radius:
+                25px 25px 0 0;
+
+            padding:
+                22px 18px;
+
+            padding-bottom:
+                calc(
+                    22px +
+                    env(safe-area-inset-bottom)
+                );
+        }
+
+
+        .modal-handle {
+
+            width: 45px;
+
+            height: 5px;
+
+            margin:
+                -7px auto 18px;
+
+            border-radius: 10px;
+
+            background: #d2d5d8;
+        }
+
+
+        .modal h2 {
+
+            margin:
+                0 0 6px;
+
+            font-size: 23px;
+
+            text-align: center;
+        }
+
+
+        .modal-subtitle {
+
+            margin:
+                0 0 18px;
+
+            color: var(--muted);
+
+            font-size: 14px;
+
+            text-align: center;
+        }
+
+
+        .form-group {
+
+            margin-bottom: 15px;
+        }
+
+
+        .form-label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 14px;
+
+            font-weight: 700;
+        }
+
+
+        .form-input {
+
+            width: 100%;
+
+            height: 53px;
+
+            border: none;
+
+            outline: none;
+
+            border-radius: 14px;
+
+            background: var(--input);
+
+            padding:
+                0 15px;
+
+            font-size: 17px;
+        }
+
+
+        .form-input:focus {
+
+            box-shadow:
+                0 0 0 2px
+                rgba(33, 150, 243, 0.25);
+        }
+
+
+        .modal-buttons {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px;
+
+            margin-top: 8px;
+        }
+
+
+        .modal-button {
+
+            min-height: 54px;
+
+            border-radius: 15px;
+
+            font-size: 16px;
+
+            font-weight: 700;
+        }
+
+
+        .cancel-button {
+
+            background: var(--input);
+        }
+
+
+        .save-button {
+
+            background: var(--blue);
+
+            color: white;
+        }
+
+
+        .danger-button {
+
+            background: var(--red);
+
+            color: white;
+        }
+
+
+        .client-result {
+
+            display: none;
+
+            margin-top: 8px;
+
+            padding: 13px;
+
+            border-radius: 14px;
+
+            background: var(--blue-light);
+
+            color: var(--blue-dark);
+        }
+
+
+        .client-result.visible {
+
+            display: block;
+        }
+
+
+        .client-result-number {
+
+            font-weight: 800;
+        }
+
+
+        .client-result-name {
+
+            margin-top: 3px;
+
+            font-size: 13px;
+        }
+
+
+        .client-actions {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px;
+
+            margin-top: 12px;
+        }
+
+
+        .client-action {
+
+            min-height: 52px;
+
+            border-radius: 14px;
+
+            font-size: 15px;
+
+            font-weight: 700;
+        }
+
+
+        .register-client-button {
+
+            background: var(--blue);
+
+            color: white;
+        }
+
+
+        .omit-client-button {
+
+            background: var(--input);
+
+            color: var(--text);
+        }
+
+
+        .pending-sale {
+
+            margin-bottom: 15px;
+
+            padding: 15px;
+
+            border-radius: 15px;
+
+            background:
+                var(--blue-light);
+
+            color:
+                var(--blue-dark);
+
+            text-align: center;
+        }
+
+
+        .pending-sale-label {
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            opacity: 0.8;
+        }
+
+
+        .pending-sale-amount {
+
+            margin-top: 4px;
+
+            font-size: 25px;
+
+            font-weight: 800;
+        }
+
+
+        /* =========================================
+           RESUMEN CLIENTES
+        ========================================== */
+
+        .client-summary-list {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 8px;
+        }
+
+
+        .client-summary-row {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr auto;
+
+            gap: 10px;
+
+            padding: 13px;
+
+            border-radius: 14px;
+
+            background: var(--input);
+        }
+
+
+        .client-summary-main {
+
+            min-width: 0;
+        }
+
+
+        .client-summary-number {
+
+            font-size: 16px;
+
+            font-weight: 800;
+        }
+
+
+        .client-summary-nickname {
+
+            margin-top: 2px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+
+        .client-summary-count {
+
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+
+        .client-summary-total {
+
+            display: flex;
+
+            align-items: center;
+
+            font-size: 17px;
+
+            font-weight: 800;
+        }
+
+
+        /* =========================================
+           TOAST
+        ========================================== */
+
+        .toast {
+
+            position: fixed;
+
+            left: 50%;
+
+            bottom: 90px;
+
+            z-index: 300;
+
+            transform:
+                translate(-50%, 20px);
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            padding:
+                12px 17px;
+
+            border-radius: 12px;
+
+            background: #111;
+
+            color: white;
+
+            font-size: 14px;
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .toast.visible {
+
+            opacity: 1;
+
+            transform:
+                translate(-50%, 0);
+        }
+
+
+        /* =========================================
+           BOTTOM NAV
+        ========================================== */
+
+        .bottom-nav {
+
+            position: fixed;
+
+            left: 0;
+
+            right: 0;
+
+            bottom: 0;
+
+            z-index: 50;
+
+            height: 74px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                rgba(255, 255, 255, 0.97);
+
+            border-top:
+                1px solid rgba(0, 0, 0, 0.06);
+
+            padding:
+                8px 18px
+                calc(
+                    8px +
+                    env(safe-area-inset-bottom)
+                );
+        }
+
+
+        .bottom-nav-inner {
+
+            width: 100%;
+
+            max-width: 500px;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 8px;
+        }
+
+
+        .nav-button {
+
+            height: 54px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 7px;
+
+            background: transparent;
+
+            border-radius: 30px;
+
+            color: #111;
+
+            font-size: 23px;
+        }
+
+
+        .nav-button.active {
+
+            background: #d9f0ff;
+
+            color: var(--blue);
+
+            font-size: 16px;
+        }
+
+
+        .nav-button span {
+
+            display: none;
+        }
+
+
+        .nav-button.active span {
+
+            display: inline;
+        }
+
+
+        /* =========================================
+           DESKTOP
+        ========================================== */
+
+        @media (min-width: 700px) {
+
+            body {
+
+                padding-bottom: 20px;
+            }
+
+
+            .bottom-nav {
+
+                display: none;
+            }
+
+
+            main {
+
+                padding-top: 30px;
+            }
+
+
+            .capture-card {
+
+                margin:
+                    0 0 18px;
+
+                border-radius:
+                    var(--radius);
+            }
+
+
+            .amount-row {
+
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    minmax(0, 1fr);
+            }
+
+
+            .modal-overlay {
+
+                align-items: center;
+
+                padding: 20px;
+            }
+
+
+            .modal {
+
+                border-radius: 25px;
+            }
+
+        }
+
+
+        @media (max-width: 390px) {
+
+            .summary-grid {
+
+                gap: 5px;
+            }
+
+
+            .summary-item {
+
+                padding:
+                    11px 4px;
+            }
+
+
+            .summary-value {
+
+                font-size: 16px;
+            }
+
+
+            .transaction {
+
+                grid-template-columns:
+                    42px 1fr auto;
+
+                gap: 8px;
+            }
+
+
+            .transaction-icon {
+
+                width: 40px;
+
+                height: 40px;
+            }
+
+
+            .transaction-amount {
+
+                font-size: 16px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="topbar">
+
+        <a href="index.html" class="logo" aria-label="Volver al menú principal">
+
+            Cor<span>tex</span>
+
+        </a>
+
+
+        <div
+            id="turnBadge"
+            class="turn-badge"
+        >
+
+            <span class="turn-dot"></span>
+
+            <span id="turnBadgeText">
+                Turno activo
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         MAIN
+    ========================================== -->
+
+    <main>
+
+
+        <!-- =====================================
+             REGISTRAR VENTA
+        ====================================== -->
+
+        <section class="capture-card">
+
+            <div class="capture-title">
+                Registrar venta
+            </div>
+
+
+            <div class="amount-row">
+
+
+                <!-- MONTO -->
+
+                <div>
+
+                    <input
+                        id="amountInput"
+                        class="amount-input"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        placeholder="$ 0.00"
+                    >
+
+                </div>
+
+
+                <!-- CLIENTE -->
+
+                <div>
+
+                    <div class="client-input-row">
+
+                        <input
+                            id="clientInput"
+                            class="client-main-input"
+                            type="number"
+                            min="0"
+                            step="1"
+                            inputmode="numeric"
+                            autocomplete="off"
+                            placeholder="Número de cliente"
+                            onclick="prepararCampoCliente()"
+                            oninput="actualizarClientePrincipal()"
+                        >
+
+                    </div>
+
+
+                    <div
+                        id="clientMainStatus"
+                        class="client-main-status"
+                    >
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <div
+                class="capture-buttons"
+                style="margin-top:10px;"
+            >
+
+                <button
+                    type="button"
+                    class="capture-button netpay-button"
+                    onclick="registrarNetpay()"
+                >
+                    Netpay
+                </button>
+
+
+                <button
+                    type="button"
+                    class="capture-button flotilla-button"
+                    onclick="abrirFlotilla()"
+                >
+                    Flotilla
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             CLIENTES FRECUENTES
+        ====================================== -->
+
+        <section class="frequent-section">
+
+            <div class="section-header">
+
+                <div class="section-title">
+                    Clientes frecuentes
+                </div>
+
+
+                <button
+                    type="button"
+                    class="section-action"
+                    onclick="abrirResumenClientes()"
+                >
+                    Ver resumen
+                </button>
+
+            </div>
+
+
+            <div
+                id="frequentList"
+                class="frequent-list"
+            >
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             TRANSACCIONES
+        ====================================== -->
+
+        <section class="transactions-section">
+
+            <div class="section-header">
+
+                <div class="section-title">
+                    Transacciones
+                </div>
+
+
+                <div
+                    id="transactionCounter"
+                    style="
+                        color:var(--muted);
+                        font-size:13px;
+                    "
+                >
+                    0
+                </div>
+
+            </div>
+
+
+            <div
+                id="transactionsList"
+                class="transactions-list"
+            >
+            </div>
+
+        </section>
+
+
+        <!-- =====================================
+             RESUMEN DEL TURNO
+             AHORA VA HASTA ABAJO
+        ====================================== -->
+
+        <section class="summary-card">
+
+            <div class="summary-title">
+                Resumen del turno
+            </div>
+
+
+            <div class="summary-grid">
+
+
+                <div class="summary-item">
+
+                    <div class="summary-label">
+                        NETPAY
+                    </div>
+
+
+                    <div
+                        id="netpayCount"
+                        class="summary-value"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <div class="summary-label">
+                        FLOTILLAS
+                    </div>
+
+
+                    <div
+                        id="flotillaCount"
+                        class="summary-value"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <div class="summary-label">
+                        OPERACIONES
+                    </div>
+
+
+                    <div
+                        id="totalCount"
+                        class="summary-value"
+                    >
+                        0
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="summary-grid"
+                style="margin-top:9px;"
+            >
+
+
+                <div class="summary-item">
+
+                    <div class="summary-label">
+                        NETPAY $
+                    </div>
+
+
+                    <div
+                        id="netpayTotal"
+                        class="summary-value"
+                    >
+                        $0.00
+                    </div>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <div class="summary-label">
+                        FLOTILLA $
+                    </div>
+
+
+                    <div
+                        id="flotillaTotal"
+                        class="summary-value"
+                    >
+                        $0.00
+                    </div>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <div class="summary-label">
+                        GENERAL $
+                    </div>
+
+
+                    <div
+                        id="generalTotalSmall"
+                        class="summary-value"
+                    >
+                        $0.00
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-total">
+
+                <div class="summary-total-label">
+                    Total general
+                </div>
+
+
+                <div
+                    id="generalTotal"
+                    class="summary-total-value"
+                >
+                    $0.00
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================================
+         MODAL CLIENTE NO REGISTRADO
+    ========================================== -->
+
+    <div
+        id="unknownClientModal"
+        class="modal-overlay"
+        onclick="cerrarClienteNoRegistradoDesdeFondo(event)"
+    >
+
+        <div class="modal">
+
+            <div class="modal-handle"></div>
+
+
+            <h2>
+                Cliente no registrado
+            </h2>
+
+
+            <p class="modal-subtitle">
+                Puedes registrarlo ahora o continuar
+                solamente con su número.
+            </p>
+
+
+            <div class="pending-sale">
+
+                <div class="pending-sale-label">
+                    Venta de flotilla
+                </div>
+
+
+                <div
+                    id="pendingSaleAmount"
+                    class="pending-sale-amount"
+                >
+                    $0.00
+                </div>
+
+
+                <div
+                    id="pendingSaleClient"
+                    style="
+                        margin-top:5px;
+                        font-size:13px;
+                    "
+                >
+                    Cliente —
+                </div>
+
+            </div>
+
+
+            <div class="client-actions">
+
+                <button
+                    type="button"
+                    class="client-action register-client-button"
+                    onclick="abrirRegistroCliente()"
+                >
+                    Registrar cliente
+                </button>
+
+
+                <button
+                    type="button"
+                    class="client-action omit-client-button"
+                    onclick="omitirRegistroCliente()"
+                >
+                    Omitir
+                </button>
+
+            </div>
+
+
+            <div
+                class="modal-buttons"
+                style="margin-top:10px;"
+            >
+
+                <button
+                    type="button"
+                    class="modal-button cancel-button"
+                    style="grid-column:1/-1;"
+                    onclick="cancelarFlotillaPendiente()"
+                >
+                    Cancelar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         MODAL REGISTRAR CLIENTE
+    ========================================== -->
+
+    <div
+        id="registerClientModal"
+        class="modal-overlay"
+        onclick="cerrarRegistroClienteDesdeFondo(event)"
+    >
+
+        <div class="modal">
+
+            <div class="modal-handle"></div>
+
+
+            <h2>
+                Registrar cliente
+            </h2>
+
+
+            <p class="modal-subtitle">
+                El cliente quedará guardado de forma permanente.
+            </p>
+
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="registerClientNumber"
+                >
+                    Número
+                </label>
+
+
+                <input
+                    id="registerClientNumber"
+                    class="form-input"
+                    type="number"
+                    readonly
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="registerClientName"
+                >
+                    Nombre
+                </label>
+
+
+                <input
+                    id="registerClientName"
+                    class="form-input"
+                    type="text"
+                    maxlength="100"
+                    autocomplete="off"
+                    placeholder="Nombre del cliente"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="registerClientNickname"
+                >
+                    Apodo
+                </label>
+
+
+                <input
+                    id="registerClientNickname"
+                    class="form-input"
+                    type="text"
+                    maxlength="60"
+                    autocomplete="off"
+                    placeholder="Apodo"
+                >
+
+            </div>
+
+
+            <div class="modal-buttons">
+
+                <button
+                    type="button"
+                    class="modal-button cancel-button"
+                    onclick="cerrarRegistroCliente()"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="button"
+                    class="modal-button save-button"
+                    onclick="guardarNuevoCliente()"
+                >
+                    Guardar y registrar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         MODAL EDITAR
+    ========================================== -->
+
+    <div
+        id="editModal"
+        class="modal-overlay"
+        onclick="cerrarEditarDesdeFondo(event)"
+    >
+
+        <div class="modal">
+
+            <div class="modal-handle"></div>
+
+
+            <h2>
+                Editar transacción
+            </h2>
+
+
+            <p
+                id="editSubtitle"
+                class="modal-subtitle"
+            >
+                —
+            </p>
+
+
+            <div
+                id="editClientGroup"
+                class="form-group"
+            >
+
+                <label
+                    class="form-label"
+                    for="editClientInput"
+                >
+                    Número de cliente
+                </label>
+
+
+                <input
+                    id="editClientInput"
+                    class="form-input"
+                    type="number"
+                    min="0"
+                    step="1"
+                    inputmode="numeric"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="editAmountInput"
+                >
+                    Monto
+                </label>
+
+
+                <input
+                    id="editAmountInput"
+                    class="form-input"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    inputmode="decimal"
+                >
+
+            </div>
+
+
+            <div class="modal-buttons">
+
+                <button
+                    type="button"
+                    class="modal-button cancel-button"
+                    onclick="cerrarEditar()"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="button"
+                    class="modal-button save-button"
+                    onclick="guardarEdicion()"
+                >
+                    Guardar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         MODAL ELIMINAR
+    ========================================== -->
+
+    <div
+        id="deleteModal"
+        class="modal-overlay"
+        onclick="cerrarEliminarDesdeFondo(event)"
+    >
+
+        <div class="modal">
+
+            <div class="modal-handle"></div>
+
+
+            <h2>
+                ¿Eliminar transacción?
+            </h2>
+
+
+            <p
+                id="deleteDescription"
+                class="modal-subtitle"
+            >
+                Esta operación se eliminará del turno.
+            </p>
+
+
+            <div class="modal-buttons">
+
+                <button
+                    type="button"
+                    class="modal-button cancel-button"
+                    onclick="cerrarEliminar()"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="button"
+                    class="modal-button danger-button"
+                    onclick="confirmarEliminar()"
+                >
+                    Eliminar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         MODAL RESUMEN CLIENTES
+    ========================================== -->
+
+    <div
+        id="clientSummaryModal"
+        class="modal-overlay"
+        onclick="cerrarResumenDesdeFondo(event)"
+    >
+
+        <div class="modal">
+
+            <div class="modal-handle"></div>
+
+
+            <h2>
+                Resumen por cliente
+            </h2>
+
+
+            <p class="modal-subtitle">
+                Ventas de flotilla del turno actual
+            </p>
+
+
+            <div
+                id="clientSummaryList"
+                class="client-summary-list"
+            >
+            </div>
+
+
+            <div class="modal-buttons">
+
+                <button
+                    type="button"
+                    class="modal-button save-button"
+                    onclick="cerrarResumenClientes()"
+                    style="grid-column:1/-1;"
+                >
+                    Cerrar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         TOAST
+    ========================================== -->
+
+    <div
+        id="toast"
+        class="toast"
+    >
+    </div>
+
+
+    <!-- =========================================
+         BOTTOM NAV
+    ========================================== -->
+
+    <nav class="bottom-nav">
+
+        <div class="bottom-nav-inner">
+
+
+            <button
+                type="button"
+                class="nav-button active"
+                aria-label="Caja"
+            >
+                🧾
+                <span>Caja</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="nav-button"
+                onclick="irA('lecturas.html')"
+                aria-label="Corte"
+            >
+                📄
+                <span>Corte</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="nav-button"
+                onclick="irA('config.html')"
+                aria-label="Menú"
+            >
+                ☰
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <script>
+
+        /*
+         * ============================================================
+         * CORTEX
+         * CAJA
+         * ============================================================
+         *
+         * Datos permanentes:
+         *
+         * estado.config.clientes
+         *
+         * Datos del turno:
+         *
+         * estado.activeTurn
+         * estado.turnData.transactions
+         *
+         * ============================================================
+         */
+
+
+        const STORAGE_KEY = "cortex";
+
+
+        let estado = null;
+
+
+        let editingTransactionId =
+            null;
+
+
+        let deletingTransactionId =
+            null;
+
+
+        /*
+         * Venta de flotilla pendiente.
+         *
+         * Se utiliza mientras preguntamos si el
+         * cliente no registrado debe guardarse.
+         */
+
+        let pendingFlotilla = null;
+
+
+        let toastTimer = null;
+
+
+        /* ============================================================
+           STORAGE
+        ============================================================ */
+
+        function crearEstadoBase() {
+
+            return {
+
+                version: 1,
+
+                config: {
+
+                    precios: {
+
+                        magna: 23.89,
+
+                        premium: 25.39,
+
+                        diesel: 26.89
+                    },
+
+
+                    islandPresets: {
+
+                        "0":
+                            [1,2,3,4,5,6,7,8],
+
+                        "1":
+                            [1,2],
+
+                        "2":
+                            [3,4],
+
+                        "3":
+                            [3,4,5],
+
+                        "4":
+                            [1,2,3,4,5,6,7,8],
+
+                        "5":
+                            [1,2,3,4,5,6,7,8],
+
+                        "6":
+                            [1,2,3,4,5,6,7,8],
+
+                        "7":
+                            [1,2,3,4,5,6,7,8],
+
+                        "8":
+                            [1,2,3,4,5,6,7,8],
+
+                        "9":
+                            [1,2,3,4,5,6,7,8]
+                    },
+
+
+                    clientes: []
+
+                },
+
+
+                activeTurn: null,
+
+                turnData: null,
+
+                lastTurnFinalReadings: null
+
+            };
+        }
+
+
+        function obtenerEstado() {
+
+            const raw =
+                localStorage.getItem(
+                    STORAGE_KEY
+                );
+
+
+            if (!raw) {
+
+                return crearEstadoBase();
+            }
+
+
+            try {
+
+                const parsed =
+                    JSON.parse(raw);
+
+
+                const base =
+                    crearEstadoBase();
+
+
+                return {
+
+                    ...base,
+
+                    ...parsed,
+
+
+                    config: {
+
+                        ...base.config,
+
+                        ...(parsed.config || {}),
+
+
+                        precios: {
+
+                            ...base.config.precios,
+
+                            ...(parsed.config?.precios || {})
+
+                        },
+
+
+                        islandPresets: {
+
+                            ...base.config.islandPresets,
+
+                            ...(parsed.config?.islandPresets || {})
+
+                        },
+
+
+                        clientes:
+
+                            Array.isArray(
+                                parsed.config?.clientes
+                            )
+
+                                ? parsed.config.clientes
+
+                                : []
+
+                    }
+
+                };
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error leyendo Cortex:",
+                    error
+                );
+
+
+                return crearEstadoBase();
+            }
+        }
+
+
+        function guardarEstado() {
+
+            localStorage.setItem(
+
+                STORAGE_KEY,
+
+                JSON.stringify(estado)
+
+            );
+        }
+
+
+        /* ============================================================
+           INICIO
+        ============================================================ */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            iniciarCaja
+        );
+
+
+        function iniciarCaja() {
+
+            estado =
+                obtenerEstado();
+
+
+            /*
+             * Protección de acceso directo.
+             */
+
+            if (!estado.activeTurn) {
+
+                window.location.replace(
+                    "index.html"
+                );
+
+                return;
+            }
+
+
+            /*
+             * Asegurar estructura del turno.
+             */
+
+            if (
+                !estado.turnData ||
+                typeof estado.turnData !== "object"
+            ) {
+
+                estado.turnData = {
+
+                    readings: {},
+
+                    transactions: [],
+
+                    createdAt:
+                        new Date().toISOString()
+
+                };
+
+
+                guardarEstado();
+            }
+
+
+            if (
+                !Array.isArray(
+                    estado.turnData.transactions
+                )
+            ) {
+
+                estado.turnData.transactions =
+                    [];
+
+
+                guardarEstado();
+            }
+
+
+            mostrarTurno();
+
+            renderizarTodo();
+
+
+            /*
+             * Enter en monto:
+             *
+             * registra Netpay.
+             */
+
+            document
+                .getElementById(
+                    "amountInput"
+                )
+                .addEventListener(
+                    "keydown",
+                    event => {
+
+                        if (
+                            event.key ===
+                            "Enter"
+                        ) {
+
+                            event.preventDefault();
+
+                            registrarNetpay();
+                        }
+
+                    }
+                );
+
+
+            /*
+             * Enter en cliente:
+             *
+             * abre flotilla directamente.
+             */
+
+            document
+                .getElementById(
+                    "clientInput"
+                )
+                .addEventListener(
+                    "keydown",
+                    event => {
+
+                        if (
+                            event.key ===
+                            "Enter"
+                        ) {
+
+                            event.preventDefault();
+
+                            abrirFlotilla();
+                        }
+
+                    }
+                );
+
+        }
+
+
+        /* ============================================================
+           TURNO
+        ============================================================ */
+
+        function mostrarTurno() {
+
+            const turno =
+                estado.activeTurn;
+
+
+            document.getElementById(
+                "turnBadgeText"
+            ).textContent =
+                `Turno ${turno.turno} · Isla ${turno.isla}`;
+        }
+
+
+        /* ============================================================
+           TRANSACCIONES
+        ============================================================ */
+
+        function obtenerTransacciones() {
+
+            if (
+                !estado.turnData ||
+                !Array.isArray(
+                    estado.turnData.transactions
+                )
+            ) {
+
+                return [];
+            }
+
+
+            return estado.turnData.transactions;
+        }
+
+
+        /* ============================================================
+           CLIENTE PRINCIPAL
+        ============================================================ */
+
+        function prepararCampoCliente() {
+
+            const input =
+                document.getElementById(
+                    "clientInput"
+                );
+
+
+            /*
+             * Al tocar el campo:
+             *
+             * seleccionamos todo el número actual.
+             *
+             * Así el usuario puede escribir inmediatamente
+             * el nuevo cliente.
+             */
+
+            setTimeout(
+                () => {
+
+                    input.select();
+
+                },
+                0
+            );
+        }
+
+
+        function actualizarClientePrincipal() {
+
+            const input =
+                document.getElementById(
+                    "clientInput"
+                );
+
+
+            const status =
+                document.getElementById(
+                    "clientMainStatus"
+                );
+
+
+            const value =
+                input.value.trim();
+
+
+            if (!value) {
+
+                status.textContent =
+                    "";
+
+                return;
+            }
+
+
+            const numero =
+                Number(value);
+
+
+            if (
+                !Number.isSafeInteger(numero) ||
+                numero < 0
+            ) {
+
+                status.textContent =
+                    "Número inválido.";
+
+                return;
+            }
+
+
+            const cliente =
+                encontrarCliente(numero);
+
+
+            if (cliente) {
+
+                status.textContent =
+                    cliente.apodo ||
+                    cliente.nombre ||
+                    "Cliente registrado.";
+
+            } else {
+
+                status.textContent =
+                    "Cliente no registrado · se podrá registrar al usar Flotilla.";
+            }
+        }
+
+
+        /* ============================================================
+           NETPAY
+        ============================================================ */
+
+        function registrarNetpay() {
+
+            const amount =
+                obtenerMonto(
+                    document.getElementById(
+                        "amountInput"
+                    ).value
+                );
+
+
+            if (amount === null) {
+
+                mostrarToast(
+                    "Ingresa un monto válido."
+                );
+
+                return;
+            }
+
+
+            crearTransaccion({
+
+                tipo: "netpay",
+
+                monto: amount
+
+            });
+
+
+            /*
+             * El monto siempre se limpia.
+             *
+             * El cliente NO se toca.
+             */
+
+            document.getElementById(
+                "amountInput"
+            ).value = "";
+
+
+            document.getElementById(
+                "amountInput"
+            ).focus();
+        }
+
+
+        /* ============================================================
+           ABRIR FLOTILLA
+        ============================================================ */
+
+        function abrirFlotilla() {
+
+            const amount =
+                obtenerMonto(
+                    document.getElementById(
+                        "amountInput"
+                    ).value
+                );
+
+
+            /*
+             * El monto sale directamente
+             * del registro de venta.
+             */
+
+            if (amount === null) {
+
+                mostrarToast(
+                    "Ingresa primero el monto de la venta."
+                );
+
+
+                document.getElementById(
+                    "amountInput"
+                ).focus();
+
+
+                return;
+            }
+
+
+            const clientInput =
+                document.getElementById(
+                    "clientInput"
+                );
+
+
+            const clientValue =
+                clientInput.value.trim();
+
+
+            if (!clientValue) {
+
+                mostrarToast(
+                    "Ingresa el número de cliente."
+                );
+
+
+                clientInput.focus();
+
+
+                return;
+            }
+
+
+            const numeroCliente =
+                Number(clientValue);
+
+
+            if (
+                !Number.isSafeInteger(
+                    numeroCliente
+                ) ||
+                numeroCliente < 0
+            ) {
+
+                mostrarToast(
+                    "Número de cliente inválido."
+                );
+
+
+                clientInput.focus();
+
+
+                return;
+            }
+
+
+            const cliente =
+                encontrarCliente(
+                    numeroCliente
+                );
+
+
+            /*
+             * Cliente encontrado:
+             *
+             * se registra directamente.
+             */
+
+            if (cliente) {
+
+                crearTransaccion({
+
+                    tipo: "flotilla",
+
+                    monto: amount,
+
+                    numeroCliente:
+                        numeroCliente
+
+                });
+
+
+                limpiarMontoDespuesDeVenta();
+
+
+                return;
+            }
+
+
+            /*
+             * Cliente no encontrado:
+             *
+             * dejamos pendiente la venta.
+             */
+
+            pendingFlotilla = {
+
+                monto: amount,
+
+                numeroCliente:
+                    numeroCliente
+
+            };
+
+
+            mostrarModalClienteNoRegistrado();
+        }
+
+
+        function limpiarMontoDespuesDeVenta() {
+
+            document.getElementById(
+                "amountInput"
+            ).value = "";
+
+
+            /*
+             * El cliente permanece.
+             *
+             * El monto se limpia para la siguiente carga.
+             */
+
+            actualizarClientePrincipal();
+
+
+            document.getElementById(
+                "amountInput"
+            ).focus();
+        }
+
+
+        /* ============================================================
+           CLIENTE NO REGISTRADO
+        ============================================================ */
+
+        function mostrarModalClienteNoRegistrado() {
+
+            if (!pendingFlotilla) {
+                return;
+            }
+
+
+            document.getElementById(
+                "pendingSaleAmount"
+            ).textContent =
+                formatoMoneda(
+                    pendingFlotilla.monto
+                );
+
+
+            document.getElementById(
+                "pendingSaleClient"
+            ).textContent =
+                `Cliente ${pendingFlotilla.numeroCliente}`;
+
+
+            document.getElementById(
+                "unknownClientModal"
+            ).classList.add(
+                "visible"
+            );
+        }
+
+
+        function cerrarClienteNoRegistrado() {
+
+            document.getElementById(
+                "unknownClientModal"
+            ).classList.remove(
+                "visible"
+            );
+        }
+
+
+        function cerrarClienteNoRegistradoDesdeFondo(
+            event
+        ) {
+
+            if (
+                event.target ===
+                document.getElementById(
+                    "unknownClientModal"
+                )
+            ) {
+
+                cancelarFlotillaPendiente();
+            }
+        }
+
+
+        function cancelarFlotillaPendiente() {
+
+            pendingFlotilla = null;
+
+            cerrarClienteNoRegistrado();
+        }
+
+
+        /*
+         * Omitir:
+         *
+         * registra solamente el número.
+         */
+
+        function omitirRegistroCliente() {
+
+            if (!pendingFlotilla) {
+                return;
+            }
+
+
+            const venta =
+                pendingFlotilla;
+
+
+            crearTransaccion({
+
+                tipo: "flotilla",
+
+                monto:
+                    venta.monto,
+
+                numeroCliente:
+                    venta.numeroCliente
+
+            });
+
+
+            pendingFlotilla = null;
+
+
+            cerrarClienteNoRegistrado();
+
+
+            limpiarMontoDespuesDeVenta();
+        }
+
+
+        /* ============================================================
+           REGISTRAR CLIENTE
+        ============================================================ */
+
+        function abrirRegistroCliente() {
+
+            if (!pendingFlotilla) {
+                return;
+            }
+
+
+            document.getElementById(
+                "registerClientNumber"
+            ).value =
+                pendingFlotilla.numeroCliente;
+
+
+            document.getElementById(
+                "registerClientName"
+            ).value =
+                "";
+
+
+            document.getElementById(
+                "registerClientNickname"
+            ).value =
+                "";
+
+
+            cerrarClienteNoRegistrado();
+
+
+            document.getElementById(
+                "registerClientModal"
+            ).classList.add(
+                "visible"
+            );
+
+
+            setTimeout(
+                () => {
+
+                    document.getElementById(
+                        "registerClientName"
+                    ).focus();
+
+                },
+                100
+            );
+        }
+
+
+        function cerrarRegistroCliente() {
+
+            document.getElementById(
+                "registerClientModal"
+            ).classList.remove(
+                "visible"
+            );
+        }
+
+
+        function cerrarRegistroClienteDesdeFondo(
+            event
+        ) {
+
+            if (
+                event.target ===
+                document.getElementById(
+                    "registerClientModal"
+                )
+            ) {
+
+                cerrarRegistroCliente();
+            }
+        }
+
+
+        function guardarNuevoCliente() {
+
+            if (!pendingFlotilla) {
+
+                cerrarRegistroCliente();
+
+                return;
+            }
+
+
+            estado =
+                obtenerEstado();
+
+
+            const numeroCliente =
+                Number(
+                    document.getElementById(
+                        "registerClientNumber"
+                    ).value
+                );
+
+
+            const nombre =
+                document.getElementById(
+                    "registerClientName"
+                ).value.trim();
+
+
+            const apodo =
+                document.getElementById(
+                    "registerClientNickname"
+                ).value.trim();
+
+
+            if (
+                !Number.isSafeInteger(
+                    numeroCliente
+                ) ||
+                numeroCliente < 0
+            ) {
+
+                mostrarToast(
+                    "Número de cliente inválido."
+                );
+
+                return;
+            }
+
+
+            /*
+             * El nombre puede quedar vacío si
+             * solamente quieren utilizar el apodo.
+             */
+
+            if (!nombre && !apodo) {
+
+                mostrarToast(
+                    "Ingresa al menos nombre o apodo."
+                );
+
+                return;
+            }
+
+
+            /*
+             * Comprobar nuevamente que no haya
+             * aparecido otro registro.
+             */
+
+            const existente =
+                encontrarCliente(
+                    numeroCliente
+                );
+
+
+            if (existente) {
+
+                mostrarToast(
+                    "Ese número de cliente ya está registrado."
+                );
+
+                cerrarRegistroCliente();
+
+                return;
+            }
+
+
+            const nuevoCliente = {
+
+                id:
+                    Date.now(),
+
+                numeroCliente:
+                    numeroCliente,
+
+                nombre:
+                    nombre,
+
+                apodo:
+                    apodo
+
+            };
+
+
+            if (
+                !Array.isArray(
+                    estado.config.clientes
+                )
+            ) {
+
+                estado.config.clientes = [];
+            }
+
+
+            estado.config.clientes.push(
+                nuevoCliente
+            );
+
+
+            guardarEstado();
+
+
+            /*
+             * Registrar inmediatamente la venta
+             * pendiente.
+             */
+
+            const venta =
+                pendingFlotilla;
+
+
+            crearTransaccion({
+
+                tipo: "flotilla",
+
+                monto:
+                    venta.monto,
+
+                numeroCliente:
+                    venta.numeroCliente
+
+            });
+
+
+            pendingFlotilla = null;
+
+
+            cerrarRegistroCliente();
+
+
+            limpiarMontoDespuesDeVenta();
+
+
+            mostrarToast(
+                "Cliente registrado y flotilla guardada."
+            );
+        }
+
+
+        /* ============================================================
+           CREAR TRANSACCIÓN
+        ============================================================ */
+
+        function crearTransaccion(
+            datos
+        ) {
+
+            estado =
+                obtenerEstado();
+
+
+            if (!estado.activeTurn) {
+
+                window.location.replace(
+                    "index.html"
+                );
+
+                return;
+            }
+
+
+            if (!estado.turnData) {
+
+                estado.turnData = {
+
+                    readings: {},
+
+                    transactions: [],
+
+                    createdAt:
+                        new Date().toISOString()
+
+                };
+            }
+
+
+            if (
+                !Array.isArray(
+                    estado.turnData.transactions
+                )
+            ) {
+
+                estado.turnData.transactions =
+                    [];
+            }
+
+
+            const transaccion = {
+
+                id:
+                    Date.now() +
+                    Math.floor(
+                        Math.random() * 1000
+                    ),
+
+
+                tipo:
+                    datos.tipo,
+
+
+                monto:
+                    Number(
+                        datos.monto.toFixed(2)
+                    ),
+
+
+                numeroCliente:
+                    datos.numeroCliente ??
+                    null,
+
+
+                fecha:
+                    new Date().toISOString()
+
+            };
+
+
+            estado.turnData.transactions.unshift(
+                transaccion
+            );
+
+
+            guardarEstado();
+
+
+            renderizarTodo();
+
+
+            mostrarToast(
+                datos.tipo === "netpay"
+
+                    ? "Netpay registrado."
+
+                    : "Flotilla registrada."
+            );
+        }
+
+
+        function obtenerMonto(
+            value
+        ) {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+
+                return null;
+            }
+
+
+            const monto =
+                Number(value);
+
+
+            if (
+                !Number.isFinite(monto) ||
+                monto <= 0
+            ) {
+
+                return null;
+            }
+
+
+            return Number(
+                monto.toFixed(2)
+            );
+        }
+
+
+        /* ============================================================
+           RENDER
+        ============================================================ */
+
+        function renderizarTodo() {
+
+            estado =
+                obtenerEstado();
+
+
+            renderizarTotales();
+
+            renderizarFrecuentes();
+
+            renderizarTransacciones();
+
+            actualizarClientePrincipal();
+        }
+
+
+        /* ============================================================
+           TOTALES
+        ============================================================ */
+
+        function renderizarTotales() {
+
+            const transacciones =
+                obtenerTransacciones();
+
+
+            const netpay =
+                transacciones.filter(
+                    t =>
+                        t.tipo ===
+                        "netpay"
+                );
+
+
+            const flotillas =
+                transacciones.filter(
+                    t =>
+                        t.tipo ===
+                        "flotilla"
+                );
+
+
+            const netpayTotal =
+                sumar(netpay);
+
+
+            const flotillaTotal =
+                sumar(flotillas);
+
+
+            const general =
+                netpayTotal +
+                flotillaTotal;
+
+
+            document.getElementById(
+                "netpayCount"
+            ).textContent =
+                netpay.length;
+
+
+            document.getElementById(
+                "flotillaCount"
+            ).textContent =
+                flotillas.length;
+
+
+            document.getElementById(
+                "totalCount"
+            ).textContent =
+                transacciones.length;
+
+
+            document.getElementById(
+                "netpayTotal"
+            ).textContent =
+                formatoMoneda(
+                    netpayTotal
+                );
+
+
+            document.getElementById(
+                "flotillaTotal"
+            ).textContent =
+                formatoMoneda(
+                    flotillaTotal
+                );
+
+
+            document.getElementById(
+                "generalTotalSmall"
+            ).textContent =
+                formatoMoneda(
+                    general
+                );
+
+
+            document.getElementById(
+                "generalTotal"
+            ).textContent =
+                formatoMoneda(
+                    general
+                );
+
+
+            document.getElementById(
+                "transactionCounter"
+            ).textContent =
+                `${transacciones.length} ${
+                    transacciones.length === 1
+                        ? "operación"
+                        : "operaciones"
+                }`;
+        }
+
+
+        function sumar(
+            transacciones
+        ) {
+
+            return transacciones.reduce(
+
+                (total, transaction) =>
+
+                    total +
+                    Number(
+                        transaction.monto || 0
+                    ),
+
+                0
+
+            );
+        }
+
+
+        /* ============================================================
+           CLIENTES
+        ============================================================ */
+
+        function obtenerClientes() {
+
+            const clientes =
+                estado.config?.clientes;
+
+
+            return Array.isArray(clientes)
+
+                ? clientes
+
+                : [];
+        }
+
+
+        function encontrarCliente(
+            numeroCliente
+        ) {
+
+            const clientes =
+                obtenerClientes();
+
+
+            return clientes.find(
+
+                cliente =>
+
+                    Number(
+                        cliente.numeroCliente
+                    ) ===
+                    Number(
+                        numeroCliente
+                    )
+
+            ) || null;
+        }
+
+
+        function obtenerApodoCliente(
+            numeroCliente
+        ) {
+
+            const cliente =
+                encontrarCliente(
+                    numeroCliente
+                );
+
+
+            if (!cliente) {
+
+                return "Cliente no registrado";
+            }
+
+
+            return cliente.apodo ||
+                   cliente.nombre ||
+                   "Sin apodo";
+        }
+
+
+        /* ============================================================
+           FRECUENTES
+        ============================================================ */
+
+        function obtenerResumenClientes() {
+
+            const flotillas =
+                obtenerTransacciones()
+                    .filter(
+
+                        transaction =>
+
+                            transaction.tipo ===
+                            "flotilla" &&
+
+                            transaction.numeroCliente !==
+                                null &&
+
+                            transaction.numeroCliente !==
+                                undefined
+
+                    );
+
+
+            const mapa =
+                new Map();
+
+
+            flotillas.forEach(
+                transaction => {
+
+                    const numero =
+                        String(
+                            transaction.numeroCliente
+                        );
+
+
+                    if (!mapa.has(numero)) {
+
+                        mapa.set(
+
+                            numero,
+
+                            {
+
+                                numeroCliente:
+                                    transaction.numeroCliente,
+
+                                transacciones:
+                                    0,
+
+                                total:
+                                    0
+
+                            }
+
+                        );
+                    }
+
+
+                    const item =
+                        mapa.get(numero);
+
+
+                    item.transacciones +=
+                        1;
+
+
+                    item.total +=
+                        Number(
+                            transaction.monto || 0
+                        );
+
+                }
+            );
+
+
+            return Array.from(
+                mapa.values()
+            )
+            .sort(
+
+                (a, b) => {
+
+                    if (
+                        b.transacciones !==
+                        a.transacciones
+                    ) {
+
+                        return (
+
+                            b.transacciones -
+                            a.transacciones
+
+                        );
+                    }
+
+
+                    return (
+                        b.total -
+                        a.total
+                    );
+
+                }
+
+            );
+        }
+
+
+        function renderizarFrecuentes() {
+
+            const container =
+                document.getElementById(
+                    "frequentList"
+                );
+
+
+            const resumen =
+                obtenerResumenClientes()
+                    .slice(0, 8);
+
+
+            if (!resumen.length) {
+
+                container.innerHTML = `
+
+                    <div class="empty-message">
+
+                        Aún no hay clientes de flotilla
+                        registrados en este turno.
+
+                    </div>
+
+                `;
+
+
+                return;
+            }
+
+
+            container.innerHTML =
+
+                resumen.map(
+
+                    item => {
+
+                        const apodo =
+                            obtenerApodoCliente(
+                                item.numeroCliente
+                            );
+
+
+                        return `
+
+                            <div class="frequent-card">
+
+                                <div class="frequent-number">
+
+                                    ${escapeHtml(
+                                        String(
+                                            item.numeroCliente
+                                        )
+                                    )}
+
+                                </div>
+
+
+                                <div class="frequent-nickname">
+
+                                    ${escapeHtml(
+                                        apodo
+                                    )}
+
+                                </div>
+
+
+                                <div class="frequent-total">
+
+                                    ${formatoMoneda(
+                                        item.total
+                                    )}
+
+                                </div>
+
+
+                                <div class="frequent-count">
+
+                                    ${item.transacciones}
+
+                                    ${
+                                        item.transacciones === 1
+
+                                            ? "transacción"
+
+                                            : "transacciones"
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        `;
+
+                    }
+
+                ).join("");
+        }
+
+
+        /* ============================================================
+           HISTORIAL
+        ============================================================ */
+
+        function renderizarTransacciones() {
+
+            const container =
+                document.getElementById(
+                    "transactionsList"
+                );
+
+
+            const transacciones =
+                obtenerTransacciones();
+
+
+            if (!transacciones.length) {
+
+                container.innerHTML = `
+
+                    <div class="empty-message">
+
+                        No hay transacciones registradas
+                        en este turno.
+
+                    </div>
+
+                `;
+
+
+                return;
+            }
+
+
+            container.innerHTML =
+
+                transacciones
+                    .map(
+                        transaction =>
+                            renderizarTransaccion(
+                                transaction
+                            )
+                    )
+                    .join("");
+        }
+
+
+        function renderizarTransaccion(
+            transaction
+        ) {
+
+            const esFlotilla =
+                transaction.tipo ===
+                "flotilla";
+
+
+            const tipoTexto =
+                esFlotilla
+
+                    ? "Flotilla"
+
+                    : "Netpay";
+
+
+            const icono =
+                esFlotilla
+
+                    ? "F"
+
+                    : "N";
+
+
+            const clienteTexto =
+                esFlotilla
+
+                    ? obtenerTextoCliente(
+                        transaction.numeroCliente
+                    )
+
+                    : "Pago Netpay";
+
+
+            const hora =
+                formatearHora(
+                    transaction.fecha
+                );
+
+
+            return `
+
+                <article class="transaction">
+
+
+                    <div
+                        class="transaction-icon ${
+                            esFlotilla
+                                ? "flotilla"
+                                : "netpay"
+                        }"
+                    >
+                        ${icono}
+                    </div>
+
+
+                    <div class="transaction-info">
+
+
+                        <div class="transaction-type">
+
+                            ${tipoTexto}
+
+                        </div>
+
+
+                        <div class="transaction-client">
+
+                            ${escapeHtml(
+                                clienteTexto
+                            )}
+
+                        </div>
+
+
+                        <div class="transaction-time">
+
+                            ${hora}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="transaction-right">
+
+
+                        <div class="transaction-amount">
+
+                            ${formatoMoneda(
+                                transaction.monto
+                            )}
+
+                        </div>
+
+
+                        <div class="transaction-actions">
+
+
+                            <button
+                                type="button"
+                                class="small-action"
+                                title="Editar"
+                                onclick="abrirEditar(${transaction.id})"
+                            >
+                                ✎
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="small-action delete"
+                                title="Eliminar"
+                                onclick="abrirEliminar(${transaction.id})"
+                            >
+                                ×
+                            </button>
+
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            `;
+        }
+
+
+        function obtenerTextoCliente(
+            numeroCliente
+        ) {
+
+            const cliente =
+                encontrarCliente(
+                    numeroCliente
+                );
+
+
+            if (!cliente) {
+
+                return `Cliente ${numeroCliente} · No registrado`;
+            }
+
+
+            const apodo =
+                cliente.apodo ||
+                cliente.nombre ||
+                "Sin apodo";
+
+
+            return `Cliente ${numeroCliente} · ${apodo}`;
+        }
+
+
+        /* ============================================================
+           EDITAR
+        ============================================================ */
+
+        function abrirEditar(
+            transactionId
+        ) {
+
+            const transaction =
+                obtenerTransacciones()
+                    .find(
+
+                        t =>
+
+                            Number(t.id) ===
+                            Number(transactionId)
+
+                    );
+
+
+            if (!transaction) {
+
+                mostrarToast(
+                    "La transacción ya no existe."
+                );
+
+                return;
+            }
+
+
+            editingTransactionId =
+                transaction.id;
+
+
+            document.getElementById(
+                "editSubtitle"
+            ).textContent =
+
+                transaction.tipo ===
+                    "flotilla"
+
+                    ? "Flotilla"
+
+                    : "Netpay";
+
+
+            const clientGroup =
+                document.getElementById(
+                    "editClientGroup"
+                );
+
+
+            if (
+                transaction.tipo ===
+                "flotilla"
+            ) {
+
+                clientGroup.style.display =
+                    "block";
+
+
+                document.getElementById(
+                    "editClientInput"
+                ).value =
+                    transaction.numeroCliente;
+
+            } else {
+
+                clientGroup.style.display =
+                    "none";
+            }
+
+
+            document.getElementById(
+                "editAmountInput"
+            ).value =
+                transaction.monto;
+
+
+            document.getElementById(
+                "editModal"
+            ).classList.add(
+                "visible"
+            );
+        }
+
+
+        function cerrarEditar() {
+
+            document.getElementById(
+                "editModal"
+            ).classList.remove(
+                "visible"
+            );
+
+
+            editingTransactionId =
+                null;
+        }
+
+
+        function cerrarEditarDesdeFondo(
+            event
+        ) {
+
+            if (
+                event.target ===
+                document.getElementById(
+                    "editModal"
+                )
+            ) {
+
+                cerrarEditar();
+            }
+        }
+
+
+        function guardarEdicion() {
+
+            if (
+                editingTransactionId ===
+                null
+            ) {
+
+                return;
+            }
+
+
+            const transactions =
+                obtenerTransacciones();
+
+
+            const transaction =
+                transactions.find(
+
+                    t =>
+
+                        Number(t.id) ===
+                        Number(
+                            editingTransactionId
+                        )
+
+                );
+
+
+            if (!transaction) {
+
+                cerrarEditar();
+
+
+                mostrarToast(
+                    "La transacción ya no existe."
+                );
+
+
+                return;
+            }
+
+
+            const amount =
+                obtenerMonto(
+
+                    document.getElementById(
+                        "editAmountInput"
+                    ).value
+
+                );
+
+
+            if (amount === null) {
+
+                mostrarToast(
+                    "Ingresa un monto válido."
+                );
+
+                return;
+            }
+
+
+            transaction.monto =
+                amount;
+
+
+            if (
+                transaction.tipo ===
+                "flotilla"
+            ) {
+
+                const clientValue =
+                    document.getElementById(
+                        "editClientInput"
+                    ).value.trim();
+
+
+                const numeroCliente =
+                    Number(
+                        clientValue
+                    );
+
+
+                if (
+
+                    !clientValue ||
+
+                    !Number.isSafeInteger(
+                        numeroCliente
+                    ) ||
+
+                    numeroCliente < 0
+
+                ) {
+
+                    mostrarToast(
+                        "Número de cliente inválido."
+                    );
+
+                    return;
+                }
+
+
+                transaction.numeroCliente =
+                    numeroCliente;
+            }
+
+
+            transaction.modificadoEn =
+                new Date().toISOString();
+
+
+            guardarEstado();
+
+
+            cerrarEditar();
+
+
+            renderizarTodo();
+
+
+            mostrarToast(
+                "Transacción actualizada."
+            );
+        }
+
+
+        /* ============================================================
+           ELIMINAR
+        ============================================================ */
+
+        function abrirEliminar(
+            transactionId
+        ) {
+
+            const transaction =
+                obtenerTransacciones()
+                    .find(
+
+                        t =>
+
+                            Number(t.id) ===
+                            Number(transactionId)
+
+                    );
+
+
+            if (!transaction) {
+
+                mostrarToast(
+                    "La transacción ya no existe."
+                );
+
+                return;
+            }
+
+
+            deletingTransactionId =
+                transaction.id;
+
+
+            const descripcion =
+
+                transaction.tipo ===
+                    "flotilla"
+
+                    ?
+
+                    `Flotilla · ${
+                        obtenerTextoCliente(
+                            transaction.numeroCliente
+                        )
+                    } · ${
+                        formatoMoneda(
+                            transaction.monto
+                        )
+                    }`
+
+                    :
+
+                    `Netpay · ${
+                        formatoMoneda(
+                            transaction.monto
+                        )
+                    }`;
+
+
+            document.getElementById(
+                "deleteDescription"
+            ).textContent =
+                `Se eliminará ${descripcion}.`;
+
+
+            document.getElementById(
+                "deleteModal"
+            ).classList.add(
+                "visible"
+            );
+        }
+
+
+        function cerrarEliminar() {
+
+            document.getElementById(
+                "deleteModal"
+            ).classList.remove(
+                "visible"
+            );
+
+
+            deletingTransactionId =
+                null;
+        }
+
+
+        function cerrarEliminarDesdeFondo(
+            event
+        ) {
+
+            if (
+                event.target ===
+                document.getElementById(
+                    "deleteModal"
+                )
+            ) {
+
+                cerrarEliminar();
+            }
+        }
+
+
+        function confirmarEliminar() {
+
+            if (
+                deletingTransactionId ===
+                null
+            ) {
+
+                return;
+            }
+
+
+            estado =
+                obtenerEstado();
+
+
+            const before =
+                obtenerTransacciones()
+                    .length;
+
+
+            estado.turnData.transactions =
+
+                obtenerTransacciones()
+                    .filter(
+
+                        transaction =>
+
+                            Number(
+                                transaction.id
+                            ) !==
+                            Number(
+                                deletingTransactionId
+                            )
+
+                    );
+
+
+            const after =
+                estado.turnData.transactions
+                    .length;
+
+
+            if (before === after) {
+
+                cerrarEliminar();
+
+
+                mostrarToast(
+                    "La transacción ya no existe."
+                );
+
+
+                return;
+            }
+
+
+            guardarEstado();
+
+
+            cerrarEliminar();
+
+
+            renderizarTodo();
+
+
+            mostrarToast(
+                "Transacción eliminada."
+            );
+        }
+
+
+        /* ============================================================
+           RESUMEN POR CLIENTE
+        ============================================================ */
+
+        function abrirResumenClientes() {
+
+            const container =
+                document.getElementById(
+                    "clientSummaryList"
+                );
+
+
+            const resumen =
+                obtenerResumenClientes();
+
+
+            if (!resumen.length) {
+
+                container.innerHTML = `
+
+                    <div class="empty-message">
+
+                        No hay ventas de flotilla
+                        para mostrar.
+
+                    </div>
+
+                `;
+
+            } else {
+
+                container.innerHTML =
+
+                    resumen
+                        .map(
+
+                            item => {
+
+                                const apodo =
+                                    obtenerApodoCliente(
+                                        item.numeroCliente
+                                    );
+
+
+                                return `
+
+                                    <div class="client-summary-row">
+
+
+                                        <div class="client-summary-main">
+
+
+                                            <div class="client-summary-number">
+
+                                                Cliente ${
+                                                    escapeHtml(
+                                                        String(
+                                                            item.numeroCliente
+                                                        )
+                                                    )
+                                                }
+
+                                            </div>
+
+
+                                            <div class="client-summary-nickname">
+
+                                                ${escapeHtml(
+                                                    apodo
+                                                )}
+
+                                            </div>
+
+
+                                            <div class="client-summary-count">
+
+                                                ${
+                                                    item.transacciones
+                                                }
+
+                                                ${
+                                                    item.transacciones === 1
+
+                                                        ? "transacción"
+
+                                                        : "transacciones"
+                                                }
+
+                                            </div>
+
+
+                                        </div>
+
+
+                                        <div class="client-summary-total">
+
+                                            ${formatoMoneda(
+                                                item.total
+                                            )}
+
+                                        </div>
+
+                                    </div>
+
+                                `;
+
+                            }
+
+                        )
+                        .join("");
+            }
+
+
+            document.getElementById(
+                "clientSummaryModal"
+            ).classList.add(
+                "visible"
+            );
+        }
+
+
+        function cerrarResumenClientes() {
+
+            document.getElementById(
+                "clientSummaryModal"
+            ).classList.remove(
+                "visible"
+            );
+        }
+
+
+        function cerrarResumenDesdeFondo(
+            event
+        ) {
+
+            if (
+                event.target ===
+                document.getElementById(
+                    "clientSummaryModal"
+                )
+            ) {
+
+                cerrarResumenClientes();
+            }
+        }
+
+
+        /* ============================================================
+           NAVEGACIÓN
+        ============================================================ */
+
+        function irA(
+            pagina
+        ) {
+
+            estado =
+                obtenerEstado();
+
+
+            /*
+             * Mientras vamos construyendo el resto
+             * de páginas, Caja solamente permite
+             * navegación normal.
+             *
+             * La protección de cada página también
+             * deberá existir en la página destino.
+             */
+
+            window.location.href =
+                pagina;
+        }
+
+
+        /* ============================================================
+           FORMATO
+        ============================================================ */
+
+        function formatoMoneda(
+            value
+        ) {
+
+            const numero =
+                Number(value || 0);
+
+
+            return numero.toLocaleString(
+
+                "es-MX",
+
+                {
+
+                    style:
+                        "currency",
+
+                    currency:
+                        "MXN",
+
+                    minimumFractionDigits:
+                        2,
+
+                    maximumFractionDigits:
+                        2
+
+                }
+
+            );
+        }
+
+
+        function formatearHora(
+            iso
+        ) {
+
+            if (!iso) {
+
+                return "—";
+            }
+
+
+            const fecha =
+                new Date(iso);
+
+
+            if (
+                Number.isNaN(
+                    fecha.getTime()
+                )
+            ) {
+
+                return "—";
+            }
+
+
+            return fecha.toLocaleTimeString(
+
+                "es-MX",
+
+                {
+
+                    hour:
+                        "2-digit",
+
+                    minute:
+                        "2-digit"
+
+                }
+
+            );
+        }
+
+
+        /* ============================================================
+           SEGURIDAD DOM
+        ============================================================ */
+
+        function escapeHtml(
+            value
+        ) {
+
+            return String(
+                value ?? ""
+            )
+
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+
+            .replace(
+                /</g,
+                "&lt;"
+            )
+
+            .replace(
+                />/g,
+                "&gt;"
+            )
+
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+        }
+
+
+        /* ============================================================
+           TOAST
+        ============================================================ */
+
+        function mostrarToast(
+            mensaje
+        ) {
+
+            const toast =
+                document.getElementById(
+                    "toast"
+                );
+
+
+            toast.textContent =
+                mensaje;
+
+
+            toast.classList.add(
+                "visible"
+            );
+
+
+            clearTimeout(
+                toastTimer
+            );
+
+
+            toastTimer =
+                setTimeout(
+
+                    () => {
+
+                        toast.classList.remove(
+                            "visible"
+                        );
+
+                    },
+
+                    2300
+
+                );
+        }
+
+
+        /* ============================================================
+           TECLADO
+        ============================================================ */
+
+        document.addEventListener(
+
+            "keydown",
+
+            event => {
+
+                if (
+                    event.key !==
+                    "Escape"
+                ) {
+
+                    return;
+                }
+
+
+                cerrarClienteNoRegistrado();
+
+                cerrarRegistroCliente();
+
+                cerrarEditar();
+
+                cerrarEliminar();
+
+                cerrarResumenClientes();
+
+
+                pendingFlotilla =
+                    null;
+
+            }
+
+        );
+
+    </script>
+
+</body>
+</html>

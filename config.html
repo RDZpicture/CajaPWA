@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Cortex - Configuración</title>
+
+    <style>
+        :root {
+            --bg: #f3f5f7;
+            --card: #ffffff;
+            --input: #edf2f7;
+            --text: #111827;
+            --muted: #667085;
+            --primary: #2196f3;
+            --primary-dark: #1976d2;
+            --primary-soft: #e3f2fd;
+            --success: #1e8e3e;
+            --danger: #d93025;
+            --border: #dfe5ec;
+            --shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            --radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            margin: 0;
+            width: 100%;
+            min-height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        body {
+            min-height: 100vh;
+            padding-bottom: 86px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .turn-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #e8f5e9;
+            color: #18851d;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .turn-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22a62a;
+        }
+
+        main {
+            width: min(100%, 820px);
+            margin: 0 auto;
+            padding: 20px 16px 30px;
+        }
+
+        .page-header {
+            margin-bottom: 20px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+            letter-spacing: -0.7px;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .panel {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px 16px 16px;
+            margin-bottom: 18px;
+        }
+
+        .panel h2 {
+            margin: 0 0 14px;
+            font-size: 22px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .panel-badge {
+            background: var(--primary-soft);
+            color: var(--primary-dark);
+            border-radius: 999px;
+            padding: 7px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            min-height: 48px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0 12px;
+            background: var(--input);
+            color: var(--text);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.12);
+        }
+
+        .note {
+            margin: 14px 0 0;
+            padding: 12px 14px;
+            border-left: 4px solid var(--primary);
+            background: #f5f9ff;
+            border-radius: 10px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .prices-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .island-config {
+            display: flex;
+            align-items: end;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .preset-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 46px;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fafbfc;
+        }
+
+        .check-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .check-item label {
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .table-wrap {
+            margin-top: 18px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fbfcfe;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f4f7fb;
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .primary-button {
+            min-width: 190px;
+            min-height: 48px;
+            padding: 0 18px;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 8px 16px rgba(33, 150, 243, 0.2);
+        }
+
+        .primary-button:active {
+            background: var(--primary-dark);
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translateX(-50%) translateY(16px);
+            opacity: 0;
+            pointer-events: none;
+            background: rgba(17, 24, 39, 0.95);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            z-index: 60;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            .form-grid,
+            .prices-grid,
+            .preset-list {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 27px;
+            }
+
+            .panel {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .button-row {
+                justify-content: stretch;
+            }
+
+            .primary-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <a href="index.html" class="logo" aria-label="Volver a la pantalla principal">Cortex</a>
+        <div id="turnBadge" class="turn-badge"><span class="turn-dot"></span><span id="turnBadgeText">Sin turno</span></div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <h1>Configuración permanente</h1>
+            <p>Centro de ajustes de Cortex.</p>
+        </div>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>1. Turno</h2>
+                <span class="panel-badge">Activo / persistente</span>
+            </div>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label for="turnNumberInput">Número de turno</label>
+                    <input id="turnNumberInput" type="text" readonly>
+                </div>
+
+                <div class="field">
+                    <label for="turnIslandInput">Isla actual</label>
+                    <input id="turnIslandInput" type="text" readonly>
+                </div>
+            </div>
+
+            <p class="note">
+                Lorem Ipsum
+                <strong>Lorem Ipsum</strong> Lorem Ipsum
+                <strong>Lorem Ipsum</strong>.
+            </p>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>2. Precios</h2>
+                <span class="panel-badge">Permanentes</span>
+            </div>
+
+            <div class="prices-grid">
+                <div class="field">
+                    <label for="magnaPrice">Magna</label>
+                    <input id="magnaPrice" type="number" min="0" step="0.01" inputmode="decimal">
+                </div>
+
+                <div class="field">
+                    <label for="premiumPrice">Premium</label>
+                    <input id="premiumPrice" type="number" min="0" step="0.01" inputmode="decimal">
+                </div>
+
+                <div class="field">
+                    <label for="dieselPrice">Diesel</label>
+                    <input id="dieselPrice" type="number" min="0" step="0.01" inputmode="decimal">
+                </div>
+            </div>
+
+            <p class="note">
+                Estos valores se guardan permanentemente y no se borran al cerrar el turno. Se reutilizan para los siguientes turnos.
+            </p>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>3. Configuración de islas</h2>
+                <span class="panel-badge">Presets</span>
+            </div>
+
+            <div class="island-config">
+                <div class="field" style="min-width: 180px;">
+                    <label for="islandSelect">Selecciona isla</label>
+                    <select id="islandSelect"></select>
+                </div>
+            </div>
+
+            <div id="presetList" class="preset-list" aria-live="polite"></div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Isla</th>
+                            <th>Dispensarios predeterminados</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>1, 2</td></tr>
+                        <tr><td>2</td><td>3, 4</td></tr>
+                        <tr><td>3</td><td>3, 4, 5</td></tr>
+                        <tr><td>0</td><td>1–8</td></tr>
+                        <tr><td>4</td><td>1–8</td></tr>
+                        <tr><td>5</td><td>1–8</td></tr>
+                        <tr><td>6</td><td>1–8</td></tr>
+                        <tr><td>7</td><td>1–8</td></tr>
+                        <tr><td>8</td><td>1–8</td></tr>
+                        <tr><td>9</td><td>1–8</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="note">
+                Cada isla tiene sus checkboxes 1–8. Cuando seleccionas una isla y cambias su preset, la próxima vez que abras un turno en esa isla se cargarán esos dispensadores.
+            </p>
+        </section>
+
+        <div class="button-row">
+            <button type="button" class="primary-button" onclick="guardarConfiguracion()">Guardar configuración</button>
+        </div>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const STORAGE_KEY = "cortex";
+
+        function crearEstadoInicial() {
+            return {
+                version: 1,
+                config: {
+                    precios: {
+                        magna: 23.89,
+                        premium: 25.39,
+                        diesel: 26.89
+                    },
+                    islandPresets: {
+                        "0": [1, 2, 3, 4, 5, 6, 7, 8],
+                        "1": [1, 2],
+                        "2": [3, 4],
+                        "3": [3, 4, 5],
+                        "4": [1, 2, 3, 4, 5, 6, 7, 8],
+                        "5": [1, 2, 3, 4, 5, 6, 7, 8],
+                        "6": [1, 2, 3, 4, 5, 6, 7, 8],
+                        "7": [1, 2, 3, 4, 5, 6, 7, 8],
+                        "8": [1, 2, 3, 4, 5, 6, 7, 8],
+                        "9": [1, 2, 3, 4, 5, 6, 7, 8]
+                    }
+                },
+                activeTurn: null,
+                turnData: null,
+                lastTurnFinalReadings: null
+            };
+        }
+
+        function obtenerEstado() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+
+            if (!raw) {
+                return crearEstadoInicial();
+            }
+
+            try {
+                const estado = JSON.parse(raw);
+                return normalizarEstado(estado);
+            } catch (error) {
+                console.error("Error leyendo datos de Cortex:", error);
+                return crearEstadoInicial();
+            }
+        }
+
+        function guardarEstado(estado) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+        }
+
+        function normalizarEstado(estado) {
+            const base = crearEstadoInicial();
+
+            if (!estado || typeof estado !== "object") {
+                return base;
+            }
+
+            return {
+                ...base,
+                ...estado,
+                config: {
+                    ...base.config,
+                    ...(estado.config || {}),
+                    precios: {
+                        ...base.config.precios,
+                        ...(estado.config?.precios || {})
+                    },
+                    islandPresets: {
+                        ...base.config.islandPresets,
+                        ...(estado.config?.islandPresets || {})
+                    }
+                }
+            };
+        }
+
+        function mostrarToast(mensaje) {
+            const toast = document.getElementById("toast");
+            toast.textContent = mensaje;
+            toast.classList.add("visible");
+
+            clearTimeout(mostrarToast.timer);
+            mostrarToast.timer = setTimeout(() => {
+                toast.classList.remove("visible");
+            }, 1800);
+        }
+
+        function renderTurnInfo() {
+            const estado = obtenerEstado();
+            const turno = estado.activeTurn;
+            const turnBadgeText = document.getElementById("turnBadgeText");
+            const turnNumberInput = document.getElementById("turnNumberInput");
+            const turnIslandInput = document.getElementById("turnIslandInput");
+
+            if (turno) {
+                turnBadgeText.textContent = `Turno ${turno.turno || "actual"}`;
+                turnNumberInput.value = turno.turno || "";
+                turnIslandInput.value = turno.isla !== undefined && turno.isla !== null ? String(turno.isla) : "";
+            } else {
+                turnBadgeText.textContent = "Sin turno";
+                turnNumberInput.value = "";
+                turnIslandInput.value = "";
+            }
+        }
+
+        function renderPrecios() {
+            const estado = obtenerEstado();
+            const precios = estado.config?.precios || {};
+
+            document.getElementById("magnaPrice").value = Number(precios.magna ?? 0);
+            document.getElementById("premiumPrice").value = Number(precios.premium ?? 0);
+            document.getElementById("dieselPrice").value = Number(precios.diesel ?? 0);
+        }
+
+        function llenarSelectIslas() {
+            const select = document.getElementById("islandSelect");
+            const opciones = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+            select.innerHTML = opciones
+                .map(isla => `<option value="${isla}">Isla ${isla}</option>`)
+                .join("");
+
+            select.value = "1";
+        }
+
+        function obtenerPresetSeleccionado(isla) {
+            const estado = obtenerEstado();
+            const presets = estado.config?.islandPresets || {};
+            const lista = presets[String(isla)] || [];
+
+            return Array.isArray(lista)
+                ? [...lista].map(Number).filter(numero => Number.isFinite(numero) && numero >= 1 && numero <= 8)
+                : [];
+        }
+
+        function renderPresetList() {
+            const select = document.getElementById("islandSelect");
+            const isla = Number(select.value);
+            const presetActual = obtenerPresetSeleccionado(isla);
+            const contenedor = document.getElementById("presetList");
+
+            contenedor.innerHTML = "";
+
+            for (let numero = 1; numero <= 8; numero++) {
+                const item = document.createElement("div");
+                item.className = "check-item";
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.id = `disp-${numero}`;
+                checkbox.checked = presetActual.includes(numero);
+                checkbox.setAttribute("data-numero", String(numero));
+
+                checkbox.addEventListener("change", function () {
+                    const selected = [...document.querySelectorAll("#presetList input:checked")].map(el => Number(el.dataset.numero));
+                    const islaSeleccionada = Number(document.getElementById("islandSelect").value);
+                    const estado = obtenerEstado();
+                    estado.config = estado.config || {};
+                    estado.config.islandPresets = estado.config.islandPresets || {};
+                    estado.config.islandPresets[String(islaSeleccionada)] = selected;
+                    document.getElementById("presetList").dataset.pending = JSON.stringify(selected);
+                });
+
+                const label = document.createElement("label");
+                label.setAttribute("for", `disp-${numero}`);
+                label.textContent = `Dispensario ${numero}`;
+
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                contenedor.appendChild(item);
+            }
+        }
+
+        function obtenerPresetSeleccionadoActual() {
+            return [...document.querySelectorAll("#presetList input:checked")]
+                .map(el => Number(el.dataset.numero))
+                .sort((a, b) => a - b);
+        }
+
+        function guardarConfiguracion() {
+            const estado = obtenerEstado();
+            const nuevaConfiguracion = {
+                magna: Number(document.getElementById("magnaPrice").value),
+                premium: Number(document.getElementById("premiumPrice").value),
+                diesel: Number(document.getElementById("dieselPrice").value)
+            };
+
+            if (!Number.isFinite(nuevaConfiguracion.magna) || nuevaConfiguracion.magna < 0) {
+                mostrarToast("Precio de Magna inválido.");
+                return;
+            }
+
+            if (!Number.isFinite(nuevaConfiguracion.premium) || nuevaConfiguracion.premium < 0) {
+                mostrarToast("Precio de Premium inválido.");
+                return;
+            }
+
+            if (!Number.isFinite(nuevaConfiguracion.diesel) || nuevaConfiguracion.diesel < 0) {
+                mostrarToast("Precio de Diesel inválido.");
+                return;
+            }
+
+            estado.config = estado.config || {};
+            estado.config.precios = {
+                magna: nuevaConfiguracion.magna,
+                premium: nuevaConfiguracion.premium,
+                diesel: nuevaConfiguracion.diesel
+            };
+
+            const islaSeleccionada = Number(document.getElementById("islandSelect").value);
+            const preset = obtenerPresetSeleccionadoActual();
+            estado.config.islandPresets = estado.config.islandPresets || {};
+            estado.config.islandPresets[String(islaSeleccionada)] = preset;
+
+            guardarEstado(estado);
+            renderTurnInfo();
+            renderPrecios();
+            renderPresetList();
+            mostrarToast("Configuración guardada.");
+        }
+
+        function inicializar() {
+            llenarSelectIslas();
+            renderTurnInfo();
+            renderPrecios();
+            renderPresetList();
+
+            document.getElementById("islandSelect").addEventListener("change", renderPresetList);
+        }
+
+        inicializar();
+    </script>
+</body>
+</html>

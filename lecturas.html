@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Cortex - Lecturas</title>
+
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#f5f7fa;
+  --card:#fff;
+  --text:#172033;
+  --muted:#667085;
+  --border:#e4e7ec;
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --danger:#dc2626;
+  --success:#15803d;
+  --shadow:0 8px 24px rgba(16,24,40,.07);
+}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  background:#fff;
+  border-bottom:1px solid var(--border);
+}
+.logo{
+  color:inherit;
+  text-decoration:none;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:-1px;
+}
+.logo span{font-weight:400}
+.turn-badge{
+  font-size:13px;
+  font-weight:700;
+  color:var(--primary);
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  border-radius:999px;
+  padding:7px 11px;
+}
+main{
+  width:min(100%,900px);
+  margin:0 auto;
+  padding:18px 14px 40px;
+}
+h1,h2,h3{margin:0}
+.page-title{font-size:25px;margin-bottom:4px}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:18px}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+.card-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:14px;
+}
+.card-title h2{font-size:19px}
+.badge{
+  font-size:12px;
+  color:var(--muted);
+  background:#f2f4f7;
+  border-radius:999px;
+  padding:6px 9px;
+}
+.pump{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  margin-top:12px;
+  background:#fcfcfd;
+}
+.pump h3{font-size:17px;margin-bottom:12px}
+.product{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+  background:#fff;
+  margin-top:10px;
+}
+.product-title{
+  font-weight:800;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.field label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+input{
+  width:100%;
+  border:1px solid #d0d5dd;
+  border-radius:10px;
+  padding:11px 10px;
+  font-size:16px;
+  background:#fff;
+  color:var(--text);
+  outline:none;
+}
+input:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(37,99,235,.1);
+}
+.reading-result{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+.result{
+  border-radius:10px;
+  background:#f8fafc;
+  padding:9px 10px;
+}
+.result small{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:3px;
+}
+.result strong{font-size:15px}
+.price{
+  color:var(--primary);
+  font-size:12px;
+}
+.summary-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:11px 0;
+  border-bottom:1px solid var(--border);
+}
+.summary-row:last-child{border-bottom:0}
+.summary-row span:first-child{color:var(--muted)}
+.summary-row strong{font-size:16px}
+.total-row{
+  margin-top:4px;
+  padding-top:14px;
+  border-top:2px solid var(--border);
+}
+.total-row strong{font-size:21px}
+.aditivos{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.aditivos input{max-width:180px;text-align:right}
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+button{
+  border:0;
+  border-radius:11px;
+  padding:12px 15px;
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:active{background:var(--primary-dark)}
+.btn-secondary{background:#eef2f6;color:#344054}
+.notice{
+  background:#fffbeb;
+  border:1px solid #fde68a;
+  color:#92400e;
+  border-radius:12px;
+  padding:12px;
+  font-size:13px;
+  margin-bottom:14px;
+}
+.empty{
+  text-align:center;
+  color:var(--muted);
+  padding:25px 10px;
+}
+.hidden{display:none!important}
+@media(max-width:560px){
+  main{padding-left:10px;padding-right:10px}
+  .topbar{padding-left:12px;padding-right:12px}
+  .grid,.reading-result{grid-template-columns:1fr}
+  .logo{font-size:25px}
+}
+</style>
+</head>
+
+<body>
+<header class="topbar">
+  <a href="index.html" class="logo" aria-label="Ir al inicio">Cor<span>tex</span></a>
+  <div id="turnBadge" class="turn-badge">Sin turno</div>
+</header>
+
+<main>
+  <h1 class="page-title">Lecturas</h1>
+  <div id="subtitle" class="subtitle">Lecturas de dispensarios del turno activo</div>
+
+  <div id="noTurnNotice" class="notice hidden">
+    No hay un turno activo. Regresando al inicio...
+  </div>
+
+  <section id="content" class="hidden">
+    <div class="card">
+      <div class="card-title">
+        <h2>Dispensarios</h2>
+        <span id="pumpCount" class="badge"></span>
+      </div>
+      <div id="pumps"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <h2>Resumen</h2>
+        <span class="badge">Turno actual</span>
+      </div>
+
+      <div class="summary-row">
+        <span>Magna</span>
+        <strong id="summaryMagna">$0.00</strong>
+      </div>
+      <div class="summary-row">
+        <span>Premium</span>
+        <strong id="summaryPremium">$0.00</strong>
+      </div>
+      <div class="summary-row">
+        <span>Diesel</span>
+        <strong id="summaryDiesel">$0.00</strong>
+      </div>
+      <div class="summary-row">
+        <span>Total litros</span>
+        <strong id="summaryLiters">0.00 L</strong>
+      </div>
+
+      <div class="summary-row total-row">
+        <span>Total Venta</span>
+        <strong id="summaryVenta">$0.00</strong>
+      </div>
+
+      <div class="summary-row aditivos">
+        <span>Aditivos</span>
+        <input id="aditivos" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00">
+      </div>
+
+      <div class="summary-row total-row">
+        <span>Total</span>
+        <strong id="summaryTotal">$0.00</strong>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <h2>Precios del turno</h2>
+        <span class="badge">Guardados permanentemente</span>
+      </div>
+      <div class="grid">
+        <div class="field">
+          <label>Magna ($/L)</label>
+          <input id="priceMagna" type="number" min="0" step="0.001" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label>Premium ($/L)</label>
+          <input id="pricePremium" type="number" min="0" step="0.001" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label>Diesel ($/L)</label>
+          <input id="priceDiesel" type="number" min="0" step="0.001" inputmode="decimal">
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" type="button" onclick="guardarTodo()">Guardar lecturas</button>
+      <button class="btn-secondary" type="button" onclick="recalcular()">Recalcular</button>
+    </div>
+  </section>
+</main>
+
+<script>
+/*
+ * ============================================================
+ * CORTEX - LECTURAS
+ *
+ * Usa la misma estructura de datos que index.html / caja.html:
+ *
+ * localStorage["cortex"]
+ *
+ * Datos permanentes:
+ *   estado.config.precios
+ *   estado.config.islandPresets
+ *
+ * Datos del turno:
+ *   estado.activeTurn
+ *   estado.turnData.readings
+ *   estado.turnData.aditivos
+ *
+ * Por eso Lecturas reconoce correctamente el turno iniciado
+ * desde index.html.
+ * ============================================================
+ */
+
+const STORAGE_KEY = "cortex";
+
+let estado = null;
+let precios = {
+  magna: 0,
+  premium: 0,
+  diesel: 0
+};
+let lecturas = {};
+
+function obtenerEstado() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+
+  if (!raw) {
+    return {
+      version: 1,
+      config: {
+        precios: {
+          magna: 0,
+          premium: 0,
+          diesel: 0
+        },
+        islandPresets: {
+          "0": [1,2,3,4,5,6,7,8],
+          "1": [1,2],
+          "2": [3,4],
+          "3": [3,4,5],
+          "4": [1,2,3,4,5,6,7,8],
+          "5": [1,2,3,4,5,6,7,8],
+          "6": [1,2,3,4,5,6,7,8],
+          "7": [1,2,3,4,5,6,7,8],
+          "8": [1,2,3,4,5,6,7,8],
+          "9": [1,2,3,4,5,6,7,8]
+        },
+        clientes: []
+      },
+      activeTurn: null,
+      turnData: null,
+      lastTurnFinalReadings: null
+    };
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    console.error("Error leyendo Cortex:", error);
+    return null;
+  }
+}
+
+function guardarEstado() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+}
+
+function numero(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function money(value) {
+  return "$" + numero(value).toLocaleString("es-MX", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function liters(value) {
+  return numero(value).toLocaleString("es-MX", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " L";
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/* ============================================================
+   TURNO
+   ============================================================ */
+
+function hayTurnoActivo() {
+  return !!(
+    estado &&
+    estado.activeTurn &&
+    typeof estado.activeTurn === "object"
+  );
+}
+
+function obtenerDispensarios() {
+  const turno = estado.activeTurn;
+
+  // Si el turno ya trae los dispensarios seleccionados,
+  // esos tienen prioridad.
+  if (Array.isArray(turno.dispensarios)) {
+    return turno.dispensarios.map(Number).filter(Number.isFinite);
+  }
+
+  if (
+    turno.dispensarios &&
+    typeof turno.dispensarios === "object"
+  ) {
+    return Object.keys(turno.dispensarios)
+      .filter(key => turno.dispensarios[key])
+      .map(Number)
+      .filter(Number.isFinite);
+  }
+
+  const isla = String(
+    turno.isla ??
+    turno.islaSeleccionada ??
+    "0"
+  );
+
+  const presets =
+    estado.config?.islandPresets ||
+    estado.config?.islas ||
+    estado.config?.presets ||
+    {};
+
+  if (Array.isArray(presets[isla])) {
+    return presets[isla].map(Number);
+  }
+
+  const defaults = {
+    "0": [1,2,3,4,5,6,7,8],
+    "1": [1,2],
+    "2": [3,4],
+    "3": [3,4,5],
+    "4": [1,2,3,4,5,6,7,8],
+    "5": [1,2,3,4,5,6,7,8],
+    "6": [1,2,3,4,5,6,7,8],
+    "7": [1,2,3,4,5,6,7,8],
+    "8": [1,2,3,4,5,6,7,8],
+    "9": [1,2,3,4,5,6,7,8]
+  };
+
+  return defaults[isla] || defaults["0"];
+}
+
+function mostrarTurno() {
+  const turno = estado.activeTurn;
+
+  const numeroTurno = turno.turno ?? "";
+  const isla = turno.isla ?? "";
+
+  let texto = "Turno activo";
+
+  if (numeroTurno !== "") {
+    texto += " · Turno " + escapeHtml(numeroTurno);
+  }
+
+  if (isla !== "") {
+    texto += " · Isla " + escapeHtml(isla);
+  }
+
+  document.getElementById("turnBadge").innerHTML = texto;
+
+  document.getElementById("subtitle").textContent =
+    "Lecturas del turno " +
+    (numeroTurno !== "" ? numeroTurno : "activo");
+}
+
+/* ============================================================
+   LECTURAS
+   ============================================================ */
+
+function inicializarLecturas() {
+  if (!estado.turnData || typeof estado.turnData !== "object") {
+    estado.turnData = {
+      readings: {},
+      transactions: [],
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  if (!estado.turnData.readings || typeof estado.turnData.readings !== "object") {
+    estado.turnData.readings = {};
+  }
+
+  lecturas = estado.turnData.readings;
+
+  const dispensarios = obtenerDispensarios();
+
+  dispensarios.forEach(d => {
+    const id = String(d);
+
+    if (!lecturas[id]) {
+      lecturas[id] = {};
+    }
+
+    ["magna", "premium", "diesel"].forEach(producto => {
+      if (!lecturas[id][producto]) {
+        lecturas[id][producto] = {
+          inicial: 0,
+          final: 0
+        };
+      }
+    });
+  });
+
+  estado.turnData.readings = lecturas;
+  guardarEstado();
+}
+
+function obtenerPrecios() {
+  const p = estado.config?.precios || {};
+
+  precios = {
+    magna: numero(p.magna),
+    premium: numero(p.premium),
+    diesel: numero(p.diesel)
+  };
+}
+
+function guardarPrecios() {
+  estado.config = estado.config || {};
+  estado.config.precios = {
+    magna: numero(document.getElementById("priceMagna").value),
+    premium: numero(document.getElementById("pricePremium").value),
+    diesel: numero(document.getElementById("priceDiesel").value)
+  };
+
+  precios = { ...estado.config.precios };
+
+  guardarEstado();
+  renderPumps();
+  renderSummary();
+}
+
+function obtenerPrecio(producto) {
+  return numero(precios[producto]);
+}
+
+/* ============================================================
+   RENDER DISPENSARIOS
+   ============================================================ */
+
+function renderPumps() {
+  const container = document.getElementById("pumps");
+  const dispensarios = obtenerDispensarios();
+
+  document.getElementById("pumpCount").textContent =
+    dispensarios.length +
+    (dispensarios.length === 1 ? " dispensario" : " dispensarios");
+
+  container.innerHTML = "";
+
+  if (!dispensarios.length) {
+    container.innerHTML =
+      '<div class="empty">No hay dispensarios asignados a este turno.</div>';
+    return;
+  }
+
+  dispensarios.forEach(d => {
+    const id = String(d);
+    const pump = lecturas[id] || {};
+
+    const div = document.createElement("div");
+    div.className = "pump";
+
+    if (Number(d) >= 1 && Number(d) <= 4) {
+      div.innerHTML = `
+        <h3>Dispensario ${escapeHtml(d)}</h3>
+        ${productoHTML(id, "magna", "Magna", precios.magna)}
+        ${productoHTML(id, "premium", "Premium", precios.premium)}
+      `;
+    } else {
+      div.innerHTML = `
+        <h3>Dispensario ${escapeHtml(d)}</h3>
+        ${productoHTML(id, "diesel", "Diesel", precios.diesel)}
+      `;
+    }
+
+    container.appendChild(div);
+  });
+
+  conectarInputs();
+}
+
+function productoHTML(id, producto, nombre, precio) {
+  const data =
+    lecturas[id]?.[producto] || {
+      inicial: 0,
+      final: 0
+    };
+
+  return `
+    <div class="product">
+      <div class="product-title">
+        <span>${nombre}</span>
+        <span class="price">$${numero(precio).toFixed(3)} / L</span>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label>Lectura inicial</label>
+          <input
+            class="reading-input"
+            data-pump="${escapeHtml(id)}"
+            data-product="${producto}"
+            data-type="inicial"
+            type="number"
+            min="0"
+            step="0.01"
+            inputmode="decimal"
+            value="${numero(data.inicial)}"
+          >
+        </div>
+
+        <div class="field">
+          <label>Lectura final</label>
+          <input
+            class="reading-input"
+            data-pump="${escapeHtml(id)}"
+            data-product="${producto}"
+            data-type="final"
+            type="number"
+            min="0"
+            step="0.01"
+            inputmode="decimal"
+            value="${numero(data.final)}"
+          >
+        </div>
+      </div>
+
+      <div class="reading-result">
+        <div class="result">
+          <small>Litros</small>
+          <strong id="litros-${id}-${producto}">0.00 L</strong>
+        </div>
+
+        <div class="result">
+          <small>Total</small>
+          <strong id="total-${id}-${producto}">$0.00</strong>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function conectarInputs() {
+  document.querySelectorAll(".reading-input").forEach(input => {
+    input.addEventListener("input", () => {
+      const pump = input.dataset.pump;
+      const product = input.dataset.product;
+      const type = input.dataset.type;
+
+      if (!lecturas[pump]) {
+        lecturas[pump] = {};
+      }
+
+      if (!lecturas[pump][product]) {
+        lecturas[pump][product] = {
+          inicial: 0,
+          final: 0
+        };
+      }
+
+      lecturas[pump][product][type] =
+        numero(input.value);
+
+      guardarLecturas();
+
+      recalcularProducto(pump, product);
+      renderSummary();
+    });
+  });
+
+  document.querySelectorAll(".reading-input").forEach(input => {
+    recalcularProducto(
+      input.dataset.pump,
+      input.dataset.product
+    );
+  });
+}
+
+function calcularProducto(pump, producto) {
+  const data = lecturas[pump]?.[producto];
+
+  if (!data) {
+    return {
+      litros: 0,
+      total: 0
+    };
+  }
+
+  const inicial = numero(data.inicial);
+  const final = numero(data.final);
+
+  const litrosVendidos =
+    Math.max(0, final - inicial);
+
+  return {
+    litros: litrosVendidos,
+    total:
+      litrosVendidos *
+      obtenerPrecio(producto)
+  };
+}
+
+function recalcularProducto(pump, producto) {
+  const resultado =
+    calcularProducto(pump, producto);
+
+  const litrosEl =
+    document.getElementById(
+      `litros-${pump}-${producto}`
+    );
+
+  const totalEl =
+    document.getElementById(
+      `total-${pump}-${producto}`
+    );
+
+  if (litrosEl) {
+    litrosEl.textContent =
+      liters(resultado.litros);
+  }
+
+  if (totalEl) {
+    totalEl.textContent =
+      money(resultado.total);
+  }
+}
+
+/* ============================================================
+   RESUMEN
+   ============================================================ */
+
+function obtenerResumen() {
+  let magna = 0;
+  let premium = 0;
+  let diesel = 0;
+  let totalLitros = 0;
+
+  Object.keys(lecturas).forEach(pump => {
+    const numeroPump = Number(pump);
+
+    if (!Number.isFinite(numeroPump)) return;
+
+    ["magna", "premium", "diesel"].forEach(producto => {
+      const r = calcularProducto(pump, producto);
+
+      if (producto === "magna") magna += r.total;
+      if (producto === "premium") premium += r.total;
+      if (producto === "diesel") diesel += r.total;
+
+      totalLitros += r.litros;
+    });
+  });
+
+  const venta =
+    magna +
+    premium +
+    diesel;
+
+  const aditivos =
+    numero(estado.turnData?.aditivos);
+
+  return {
+    magna,
+    premium,
+    diesel,
+    totalLitros,
+    venta,
+    aditivos,
+    total: venta + aditivos
+  };
+}
+
+function renderSummary() {
+  const r = obtenerResumen();
+
+  document.getElementById("summaryMagna").textContent =
+    money(r.magna);
+
+  document.getElementById("summaryPremium").textContent =
+    money(r.premium);
+
+  document.getElementById("summaryDiesel").textContent =
+    money(r.diesel);
+
+  document.getElementById("summaryLiters").textContent =
+    liters(r.totalLitros);
+
+  document.getElementById("summaryVenta").textContent =
+    money(r.venta);
+
+  document.getElementById("aditivos").value =
+    r.aditivos ? r.aditivos : "";
+
+  document.getElementById("summaryTotal").textContent =
+    money(r.total);
+}
+
+/* ============================================================
+   GUARDADO
+   ============================================================ */
+
+function guardarLecturas() {
+  if (!estado.turnData) {
+    estado.turnData = {
+      readings: {},
+      transactions: [],
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  estado.turnData.readings = lecturas;
+
+  const aditivos =
+    document.getElementById("aditivos");
+
+  if (aditivos) {
+    estado.turnData.aditivos =
+      numero(aditivos.value);
+  }
+
+  guardarEstado();
+}
+
+function guardarTodo() {
+  guardarPrecios();
+
+  if (!estado.turnData) {
+    estado.turnData = {
+      readings: {},
+      transactions: [],
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  estado.turnData.readings = lecturas;
+  estado.turnData.aditivos =
+    numero(document.getElementById("aditivos").value);
+
+  guardarEstado();
+
+  renderSummary();
+
+  alert("Lecturas guardadas correctamente.");
+}
+
+function recalcular() {
+  renderPumps();
+  renderSummary();
+}
+
+/* ============================================================
+   INICIO
+   ============================================================ */
+
+function iniciarLecturas() {
+  estado = obtenerEstado();
+
+  /*
+   * IMPORTANTE:
+   * index.html y caja.html utilizan:
+   *
+   * localStorage["cortex"].activeTurn
+   *
+   * No se utiliza cortex_turno.
+   */
+  if (!hayTurnoActivo()) {
+    document
+      .getElementById("noTurnNotice")
+      .classList.remove("hidden");
+
+    setTimeout(() => {
+      window.location.replace("index.html");
+    }, 900);
+
+    return;
+  }
+
+  document
+    .getElementById("content")
+    .classList.remove("hidden");
+
+  obtenerPrecios();
+  inicializarLecturas();
+  mostrarTurno();
+
+  document.getElementById("priceMagna").value =
+    precios.magna || "";
+
+  document.getElementById("pricePremium").value =
+    precios.premium || "";
+
+  document.getElementById("priceDiesel").value =
+    precios.diesel || "";
+
+  document
+    .getElementById("priceMagna")
+    .addEventListener("change", guardarPrecios);
+
+  document
+    .getElementById("pricePremium")
+    .addEventListener("change", guardarPrecios);
+
+  document
+    .getElementById("priceDiesel")
+    .addEventListener("change", guardarPrecios);
+
+  document
+    .getElementById("aditivos")
+    .addEventListener("input", () => {
+      if (!estado.turnData) return;
+
+      estado.turnData.aditivos =
+        numero(document.getElementById("aditivos").value);
+
+      guardarEstado();
+      renderSummary();
+    });
+
+  renderPumps();
+  renderSummary();
+}
+
+window.addEventListener("storage", () => {
+  estado = obtenerEstado();
+
+  if (!hayTurnoActivo()) {
+    window.location.replace("index.html");
+  }
+});
+
+window.addEventListener("beforeunload", () => {
+  if (estado && hayTurnoActivo()) {
+    guardarLecturas();
+  }
+});
+
+document.addEventListener(
+  "DOMContentLoaded",
+  iniciarLecturas
+);
+</script>
+</body>
+</html>
