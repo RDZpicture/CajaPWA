@@ -1,477 +1,2275 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caja PWA</title>
-  
-  <!-- PASO 3: Vinculación del Manifest para PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#121214">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-  <style>
-    :root {
-      --bg: #121214;
-      --card: #1e1e24;
-      --accent: #6366f1;
-      --accent-hover: #4f46e5;
-      --text: #f3f4f6;
-      --muted: #9ca3af;
-      --border: #374151;
-      --danger: #ef4444;
-      --success: #10b981;
-    }
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 16px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 16px; }
+    <title>Cortex</title>
 
-    /* Header Nav Bar */
-    .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .nav-btn { 
-      background: #27272a; border: 1px solid var(--border); color: var(--text); 
-      padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; 
-      cursor: pointer; display: flex; align-items: center; gap: 6px;
-    }
-    .nav-btn:active { background: #3f3f46; }
+    <!-- Más adelante podemos conectar aquí manifest.json -->
+    <!-- <link rel="manifest" href="manifest.json"> -->
 
-    .card { background: var(--card); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
-    h2 { font-size: 1.1rem; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    /* Switch de Selección (NetPay / Flotillas) */
-    .type-selector { display: flex; gap: 8px; margin-bottom: 16px; }
-    .type-btn { 
-      flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border); 
-      background: #18181b; color: var(--muted); font-weight: bold; cursor: pointer; text-align: center;
-    }
-    .type-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        :root {
+            --blue: #2196f3;
+            --blue-dark: #1976d2;
+            --blue-light: #e3f2fd;
 
-    /* Acceso Rápido Frecuentes */
-    .frequent-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
-    .freq-card { 
-      background: #18181b; border: 1px solid var(--border); border-radius: 8px; 
-      padding: 8px 4px; text-align: center; cursor: pointer; transition: border 0.2s;
-    }
-    .freq-card:active { border-color: var(--accent); background: #27272a; }
-    .freq-title { font-size: 0.8rem; font-weight: bold; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .freq-sub { font-size: 0.7rem; color: var(--muted); }
+            --green: #21a321;
+            --red: #e3262e;
 
-    .input-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-    label { font-size: 0.85rem; color: var(--muted); }
-    input { 
-      background: #18181b; border: 1px solid var(--border); border-radius: 8px; 
-      padding: 12px; color: #fff; font-size: 1rem; outline: none; transition: border 0.2s;
-    }
-    input:focus { border-color: var(--accent); }
+            --bg: #f1f4f5;
+            --card: #ffffff;
+            --input: #e7eaee;
 
-    .btn { 
-      background: var(--accent); color: white; border: none; border-radius: 8px; 
-      padding: 12px; font-weight: bold; cursor: pointer; text-align: center; width: 100%;
-    }
-    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--muted); margin-top: 8px; }
-    .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); margin-top: 16px; }
+            --text: #111111;
+            --muted: #7c8798;
 
-    /* Modal / Overlay */
-    .overlay { 
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
-      background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 100;
-    }
-    .modal { background: var(--card); width: 100%; max-width: 400px; border-radius: 12px; padding: 20px; border: 1px solid var(--border); }
+            --shadow:
+                0 4px 12px rgba(0, 0, 0, 0.10);
 
-    .client-active-info { font-size: 1.1rem; font-weight: bold; color: var(--accent); margin-bottom: 12px; }
-    
-    /* Tabla Resumen */
-    .summary-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-    .summary-table th, .summary-table td { 
-      padding: 10px 6px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; 
-    }
-    .summary-table th { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
-    
-    /* Filas del Pie de Tabla */
-    tfoot tr { background: #18181b; }
-    .subtotal-row td { color: var(--muted); font-size: 0.9rem; border-bottom: 1px dashed var(--border); }
-    .total-row { font-weight: bold; color: var(--success); }
-    .total-row td { border-bottom: none; font-size: 1rem; }
-  </style>
+            --radius: 20px;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        body {
+            min-height: 100vh;
+            padding-bottom: 90px;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+
+            height: 70px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(255, 255, 255, 0.96);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: var(--blue);
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        main {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 22px 18px 30px;
+        }
+
+        .welcome {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .welcome h1 {
+            margin: 0 0 7px;
+            font-size: 30px;
+        }
+
+        .welcome p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        /* =========================
+           TURNO ACTIVO
+        ========================= */
+
+        .turn-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .turn-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .turn-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+
+            padding: 7px 11px;
+            border-radius: 999px;
+
+            background: #e8f5e9;
+            color: #18851d;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22a62a;
+        }
+
+        .turn-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .info-box {
+            background: var(--input);
+            border-radius: 14px;
+            padding: 12px;
+        }
+
+        .info-label {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .dispensers {
+            margin-top: 12px;
+            background: var(--blue-light);
+            color: var(--blue-dark);
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        /* =========================
+           MENU
+        ========================= */
+
+        .menu-title {
+            margin: 25px 0 12px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .menu-button {
+            min-height: 135px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+
+            color: var(--text);
+
+            transition:
+                transform 0.12s ease,
+                box-shadow 0.12s ease;
+        }
+
+        .menu-button:active {
+            transform: scale(0.97);
+        }
+
+        .menu-icon {
+            width: 52px;
+            height: 52px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 16px;
+
+            background: var(--blue-light);
+            color: var(--blue);
+
+            font-size: 27px;
+        }
+
+        .menu-label {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .menu-description {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .menu-button.disabled {
+            opacity: 0.45;
+        }
+
+        .close-button {
+            grid-column: 1 / -1;
+            min-height: 65px;
+
+            flex-direction: row;
+
+            background: #fff0f1;
+            color: var(--red);
+        }
+
+        .close-button .menu-icon {
+            width: 42px;
+            height: 42px;
+            background: transparent;
+            color: var(--red);
+            font-size: 23px;
+        }
+
+        /* =========================
+           SIN TURNO
+        ========================= */
+
+        .no-turn {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .no-turn-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 20px;
+            background: var(--blue-light);
+            color: var(--blue);
+
+            font-size: 30px;
+        }
+
+        .no-turn h2 {
+            margin: 0 0 8px;
+            font-size: 21px;
+        }
+
+        .no-turn p {
+            margin: 0 0 18px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .primary-button {
+            width: 100%;
+            min-height: 56px;
+
+            border-radius: 16px;
+
+            background: var(--blue);
+            color: white;
+
+            font-size: 18px;
+            font-weight: 700;
+
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.25);
+        }
+
+        .primary-button:active {
+            background: var(--blue-dark);
+        }
+
+        /* =========================
+           BOTTOM NAV
+        ========================= */
+
+        .bottom-nav {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 30;
+
+            height: 74px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(255, 255, 255, 0.97);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+            padding:
+                8px 18px
+                calc(8px + env(safe-area-inset-bottom));
+        }
+
+        .bottom-nav-inner {
+            width: 100%;
+            max-width: 500px;
+
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-button {
+            height: 54px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+
+            background: transparent;
+            border-radius: 30px;
+
+            color: #111;
+            font-size: 24px;
+        }
+
+        .nav-button.active {
+            background: #d9f0ff;
+            color: var(--blue);
+
+            font-size: 16px;
+        }
+
+        .nav-button span {
+            display: none;
+        }
+
+        .nav-button.active span {
+            display: inline;
+        }
+
+        /* =========================
+           MODAL
+        ========================= */
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+
+            background: rgba(0, 0, 0, 0.55);
+
+            padding: 0;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 600px;
+            max-height: 94vh;
+
+            overflow-y: auto;
+
+            background: white;
+
+            border-radius:
+                25px 25px 0 0;
+
+            padding: 22px 18px;
+            padding-bottom:
+                calc(22px + env(safe-area-inset-bottom));
+        }
+
+        .modal-handle {
+            width: 45px;
+            height: 5px;
+
+            margin: -7px auto 18px;
+
+            border-radius: 10px;
+            background: #d2d5d8;
+        }
+
+        .modal h2 {
+            margin: 0 0 6px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .modal-subtitle {
+            margin: 0 0 20px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 7px;
+
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            height: 52px;
+
+            border: none;
+            outline: none;
+
+            border-radius: 14px;
+
+            background: var(--input);
+
+            padding: 0 15px;
+
+            font-size: 17px;
+            color: var(--text);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            box-shadow:
+                0 0 0 2px rgba(33, 150, 243, 0.25);
+        }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .price-item label {
+            display: block;
+            margin-bottom: 6px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .price-item .form-input {
+            padding: 0 8px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* =========================
+           DISPENSADORES
+        ========================= */
+
+        .dispenser-preview {
+            background: var(--bg);
+            border-radius: 15px;
+            padding: 13px;
+            margin: 4px 0 18px;
+        }
+
+        .dispenser-preview-title {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .dispenser-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .dispenser-chip {
+            padding: 7px 10px;
+            border-radius: 10px;
+
+            background: white;
+            color: var(--blue-dark);
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .modal-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .secondary-button,
+        .start-button {
+            min-height: 54px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .secondary-button {
+            background: var(--input);
+            color: var(--text);
+        }
+
+        .start-button {
+            background: var(--blue);
+            color: white;
+        }
+
+        /* =========================
+           CONFIRM
+        ========================= */
+
+        .confirm-modal {
+            width: calc(100% - 30px);
+            max-width: 450px;
+
+            border-radius: 22px;
+
+            padding: 24px;
+        }
+
+        .confirm-modal h2 {
+            margin-top: 0;
+            text-align: left;
+        }
+
+        .confirm-modal p {
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .danger-button {
+            min-height: 52px;
+            border-radius: 14px;
+
+            background: var(--red);
+            color: white;
+
+            font-weight: 700;
+        }
+
+        /* =========================
+           TOAST
+        ========================= */
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 90px;
+            z-index: 200;
+
+            transform:
+                translate(-50%, 20px);
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            background: #111;
+            color: white;
+
+            padding: 12px 17px;
+
+            border-radius: 12px;
+
+            font-size: 14px;
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .toast.visible {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (min-width: 700px) {
+            body {
+                padding-bottom: 20px;
+            }
+
+            .bottom-nav {
+                display: none;
+            }
+
+            main {
+                padding-top: 35px;
+            }
+
+            .modal-overlay {
+                align-items: center;
+                padding: 20px;
+            }
+
+            .modal {
+                border-radius: 25px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .menu-grid {
+                gap: 10px;
+            }
+
+            .menu-button {
+                min-height: 120px;
+            }
+
+            .menu-label {
+                font-size: 15px;
+            }
+
+            .price-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .price-item label {
+                text-align: left;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="container">
+    <!-- =========================
+         HEADER
+    ========================== -->
 
-  <!-- BARRA SUPERIOR DE NAVEGACIÓN -->
-  <div class="header-nav">
-    <span style="font-weight: bold; color: #fff;">Caja PWA</span>
-    <button class="nav-btn" onclick="irASegundaPagina()">
-      Lecturas ➔
-    </button>
-  </div>
+    <header class="topbar">
+        <div class="logo">
+            Cor<span>tex</span>
+        </div>
+    </header>
 
-  <!-- SELECTOR DE MODO -->
-  <div class="type-selector">
-    <button class="type-btn active" id="btnNetPay" onclick="seleccionarModo('netpay')">NetPay</button>
-    <button class="type-btn" id="btnFlotillas" onclick="seleccionarModo('flotillas')">Flotillas / Buscar</button>
-  </div>
 
-  <!-- 1. BUSCADOR Y FRECUENTES (MODO FLOTILLAS) -->
-  <div class="card" id="panelBusqueda" style="display: none;">
-    <h2>Búsqueda de Cliente</h2>
-    
-    <!-- Clientes Frecuentes -->
-    <div id="seccionFrecuentes" style="display: none;">
-      <label style="margin-bottom: 6px; display: block;">Clientes Frecuentes</label>
-      <div class="frequent-grid" id="frequentContainer"></div>
+    <!-- =========================
+         CONTENIDO
+    ========================== -->
+
+    <main>
+
+        <section class="welcome">
+            <h1>Panel principal</h1>
+            <p id="welcomeText">Control de turno y operación</p>
+        </section>
+
+
+        <!-- SIN TURNO -->
+
+        <section id="noTurnSection" class="no-turn">
+
+            <div class="no-turn-icon">
+                ⏱
+            </div>
+
+            <h2>No hay turno activo</h2>
+
+            <p>
+                Inicia un turno para comenzar a registrar
+                lecturas y movimientos de caja.
+            </p>
+
+            <button
+                type="button"
+                class="primary-button"
+                onclick="abrirModalInicio()"
+            >
+                Iniciar turno
+            </button>
+
+        </section>
+
+
+        <!-- TURNO ACTIVO -->
+
+        <section
+            id="activeTurnSection"
+            class="turn-card"
+            style="display:none;"
+        >
+
+            <div class="turn-header">
+
+                <div class="turn-title">
+                    Turno activo
+                </div>
+
+                <div class="status">
+                    <span class="status-dot"></span>
+                    Activo
+                </div>
+
+            </div>
+
+
+            <div class="turn-info">
+
+                <div class="info-box">
+                    <div class="info-label">
+                        Isla
+                    </div>
+
+                    <div
+                        id="activeIsland"
+                        class="info-value"
+                    >
+                        —
+                    </div>
+                </div>
+
+
+                <div class="info-box">
+                    <div class="info-label">
+                        Turno
+                    </div>
+
+                    <div
+                        id="activeShift"
+                        class="info-value"
+                    >
+                        —
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div
+                id="activeDispensers"
+                class="dispensers"
+            >
+                Dispensadores: —
+            </div>
+
+        </section>
+
+
+        <!-- MENU -->
+
+        <div class="menu-title">
+            Operación
+        </div>
+
+
+        <section class="menu-grid">
+
+            <!-- CAJA -->
+
+            <button
+                type="button"
+                class="menu-button"
+                onclick="irA('caja.html')"
+                data-requires-turn
+            >
+                <div class="menu-icon">
+                    🧾
+                </div>
+
+                <div class="menu-label">
+                    Caja
+                </div>
+
+                <div class="menu-description">
+                    Netpay y flotillas
+                </div>
+            </button>
+
+
+            <!-- LECTURAS -->
+
+            <button
+                type="button"
+                class="menu-button"
+                onclick="irA('lecturas.html')"
+                data-requires-turn
+            >
+                <div class="menu-icon">
+                    ⛽
+                </div>
+
+                <div class="menu-label">
+                    Lecturas
+                </div>
+
+                <div class="menu-description">
+                    Dispensarios
+                </div>
+            </button>
+
+
+            <!-- CLIENTES -->
+
+            <button
+                type="button"
+                class="menu-button"
+                onclick="irA('clientes.html')"
+            >
+                <div class="menu-icon">
+                    👥
+                </div>
+
+                <div class="menu-label">
+                    Clientes
+                </div>
+
+                <div class="menu-description">
+                    Directorio
+                </div>
+            </button>
+
+
+            <!-- CONFIG -->
+
+            <button
+                type="button"
+                class="menu-button"
+                onclick="irA('config.html')"
+            >
+                <div class="menu-icon">
+                    ⚙
+                </div>
+
+                <div class="menu-label">
+                    Configuración
+                </div>
+
+                <div class="menu-description">
+                    Precios e islas
+                </div>
+            </button>
+
+
+            <!-- CERRAR TURNO -->
+
+            <button
+                type="button"
+                class="menu-button close-button"
+                onclick="confirmarCierre()"
+                data-requires-turn
+            >
+                <div class="menu-icon">
+                    ⏻
+                </div>
+
+                <div>
+                    <div class="menu-label">
+                        Cerrar turno
+                    </div>
+
+                    <div class="menu-description">
+                        Finalizar corte actual
+                    </div>
+                </div>
+
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         NAVEGACIÓN INFERIOR
+    ========================== -->
+
+    <nav class="bottom-nav">
+
+        <div class="bottom-nav-inner">
+
+            <button
+                type="button"
+                class="nav-button"
+                onclick="irA('caja.html')"
+                data-requires-turn
+                aria-label="Caja"
+            >
+                🧾
+                <span>Caja</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="nav-button active"
+                aria-label="Corte"
+            >
+                📄
+                <span>Corte</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="nav-button"
+                onclick="irA('config.html')"
+                aria-label="Menú"
+            >
+                ☰
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =========================
+         MODAL INICIAR TURNO
+    ========================== -->
+
+    <div
+        id="startModal"
+        class="modal-overlay"
+        onclick="cerrarModalDesdeFondo(event)"
+    >
+
+        <div class="modal">
+
+            <div class="modal-handle"></div>
+
+            <h2>Iniciar turno</h2>
+
+            <p class="modal-subtitle">
+                Configura los datos del nuevo turno
+            </p>
+
+
+            <!-- ISLA -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="islandInput"
+                >
+                    Isla
+                </label>
+
+                <select
+                    id="islandInput"
+                    class="form-select"
+                    onchange="actualizarDispensadoresPreview()"
+                >
+                </select>
+
+            </div>
+
+
+            <!-- TURNO -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="shiftInput"
+                >
+                    Turno
+                </label>
+
+                <input
+                    id="shiftInput"
+                    class="form-input"
+                    type="number"
+                    min="1"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="Ej. 1"
+                >
+
+            </div>
+
+
+            <!-- PRECIOS -->
+
+            <div class="form-group">
+
+                <label class="form-label">
+                    Precios
+                </label>
+
+                <div class="price-grid">
+
+                    <div class="price-item">
+
+                        <label for="magnaPrice">
+                            Magna
+                        </label>
+
+                        <input
+                            id="magnaPrice"
+                            class="form-input"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            inputmode="decimal"
+                        >
+
+                    </div>
+
+
+                    <div class="price-item">
+
+                        <label for="premiumPrice">
+                            Premium
+                        </label>
+
+                        <input
+                            id="premiumPrice"
+                            class="form-input"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            inputmode="decimal"
+                        >
+
+                    </div>
+
+
+                    <div class="price-item">
+
+                        <label for="dieselPrice">
+                            Diesel
+                        </label>
+
+                        <input
+                            id="dieselPrice"
+                            class="form-input"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            inputmode="decimal"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- DISPENSADORES -->
+
+            <div class="dispenser-preview">
+
+                <div class="dispenser-preview-title">
+                    Dispensadores que estarán activos
+                </div>
+
+                <div
+                    id="dispenserPreview"
+                    class="dispenser-list"
+                >
+                </div>
+
+            </div>
+
+
+            <!-- BOTONES -->
+
+            <div class="modal-buttons">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    onclick="cerrarModalInicio()"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="start-button"
+                    onclick="iniciarTurno()"
+                >
+                    Comenzar
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="input-group">
-      <label for="numClienteInput">Número de Cliente</label>
-      <input type="number" id="numClienteInput" placeholder="Ej. 102" onclick="limpiarBuscador()" onkeydown="if(event.key==='Enter') buscarCliente()">
-    </div>
-    <button class="btn" onclick="buscarCliente()">Buscar / Seleccionar</button>
-  </div>
 
-  <!-- 2. PANEL DE IMPORTE -->
-  <div class="card" id="panelImporte">
-    <div class="client-active-info" id="clienteActivoLabel">Cuenta: NetPay</div>
-    <div class="input-group">
-      <label for="importeInput">Importe a sumar ($)</label>
-      <input type="number" step="0.01" id="importeInput" placeholder="0.00" onkeydown="procesarImporte(event)">
-    </div>
-  </div>
+    <!-- =========================
+         MODAL CONFIRMAR CIERRE
+    ========================== -->
 
-  <!-- 3. RESUMEN DE CLIENTES -->
-  <div class="card" id="panelResumen" style="display: none;">
-    <h2>Resumen de Transacciones</h2>
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th>Tx</th>
-          <th>#</th>
-          <th>Cliente</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody id="resumenTablaBody"></tbody>
-      <tfoot>
-        <!-- Total Flotillas -->
-        <tr class="subtotal-row">
-          <td id="totalTxFlotillas">0</td>
-          <td colspan="2">TOTAL FLOTILLAS</td>
-          <td id="totalMontoFlotillas">$0.00</td>
-        </tr>
-        <!-- Total NetPay -->
-        <tr class="subtotal-row">
-          <td id="totalTxNetPay">0</td>
-          <td colspan="2">TOTAL NETPAY</td>
-          <td id="totalMontoNetPay">$0.00</td>
-        </tr>
-        <!-- Total General -->
-        <tr class="total-row">
-          <td id="totalTxGlobal">0</td>
-          <td colspan="2">TOTAL GENERAL</td>
-          <td id="totalMontoGlobal">$0.00</td>
-        </tr>
-      </tfoot>
-    </table>
+    <div
+        id="closeModal"
+        class="modal-overlay"
+        onclick="cerrarConfirmacionDesdeFondo(event)"
+    >
 
-    <button class="btn btn-danger" onclick="reiniciarTransacciones()">Reiniciar Transacciones del Día</button>
-  </div>
+        <div class="modal confirm-modal">
 
-</div>
+            <h2>
+                ¿Cerrar turno?
+            </h2>
 
-<!-- MODAL REGISTRO -->
-<div class="overlay" id="modalRegistro">
-  <div class="modal">
-    <h2 style="color: #fff; margin-bottom: 16px;">Cliente no encontrado</h2>
-    <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 16px;">
-      El número <b id="numNoEncontradoTexto"></b> no está registrado. ¿Deseas darlo de alta?
-    </p>
+            <p>
+                Al cerrar el turno se eliminarán los datos
+                operativos del turno actual, incluyendo las
+                lecturas y las transacciones.
+            </p>
 
-    <div id="formRegistro" style="display: none;">
-      <div class="input-group">
-        <label>Número de Cliente</label>
-        <input type="number" id="regNum" disabled>
-      </div>
-      <div class="input-group">
-        <label>Nombre Completo</label>
-        <input type="text" id="regNombre" placeholder="Ej. Todo Mexico Por Tierra">
-      </div>
-      <div class="input-group">
-        <label>Apodo (Visualización)</label>
-        <input type="text" id="regApodo" placeholder="Ej. TMT">
-      </div>
-      <button class="btn" onclick="guardarCliente()">Guardar y Seleccionar</button>
+            <p>
+                Los clientes, precios y configuraciones
+                permanentes no se eliminarán.
+            </p>
+
+
+            <div class="modal-buttons">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    onclick="cerrarConfirmacion()"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="button"
+                    class="danger-button"
+                    onclick="cerrarTurno()"
+                >
+                    Cerrar turno
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div id="opcionesIniciales">
-      <button class="btn" onclick="mostrarFormularioRegistro()">Registrar</button>
-      <button class="btn btn-secondary" onclick="omitirRegistro()">Omitir</button>
-    </div>
-  </div>
-</div>
 
-<script>
-  // PASO 3: Registro del Service Worker para soporte Offline / PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker registrado:', reg))
-        .catch(err => console.log('Error al registrar Service Worker:', err));
-    });
-  }
+    <!-- TOAST -->
 
-  let clientes = JSON.parse(localStorage.getItem('caja_clientes')) || [];
-  
-  // Cliente NetPay
-  let clienteNetPay = { num: 0, nombre: "Cuenta NetPay", apodo: "NetPay", transacciones: 0, total: 0.00, esNetPay: true };
-  const netPayGuardado = JSON.parse(localStorage.getItem('caja_netpay'));
-  if (netPayGuardado) clienteNetPay = netPayGuardado;
+    <div
+        id="toast"
+        class="toast"
+    ></div>
 
-  let clienteSeleccionado = clienteNetPay;
-  let modoActual = 'netpay';
 
-  renderFrecuentes();
-  actualizarResumenUI();
-  document.getElementById('importeInput').focus();
+    <script>
+        /*
+         * ============================================================
+         * CORTEX
+         * index.html
+         *
+         * Esta es la primera base del sistema de persistencia.
+         *
+         * Datos permanentes:
+         *   cortex.config
+         *
+         * Datos del turno:
+         *   cortex.activeTurn
+         *   cortex.turnData
+         *
+         * Posteriormente caja.html y lecturas.html utilizarán
+         * exactamente estas mismas estructuras.
+         * ============================================================
+         */
 
-  // Función de navegación a la segunda página
-  function irASegundaPagina() {
-    window.location.href = 'Lecturas.html';
-    // Aquí integraremos la lógica de la vista secundaria que me indiques
-  }
 
-  function seleccionarModo(modo) {
-    modoActual = modo;
-    const btnNetPay = document.getElementById('btnNetPay');
-    const btnFlotillas = document.getElementById('btnFlotillas');
-    const panelBusqueda = document.getElementById('panelBusqueda');
+        /* ============================================================
+           STORAGE
+        ============================================================ */
 
-    if (modo === 'netpay') {
-      btnNetPay.classList.add('active');
-      btnFlotillas.classList.remove('active');
-      panelBusqueda.style.display = 'none';
-      
-      clienteSeleccionado = clienteNetPay;
-      document.getElementById('clienteActivoLabel').innerText = `Cuenta: NetPay`;
-    } else {
-      btnFlotillas.classList.add('active');
-      btnNetPay.classList.remove('active');
-      panelBusqueda.style.display = 'block';
-      
-      document.getElementById('clienteActivoLabel').innerText = `Selecciona un cliente...`;
-      clienteSeleccionado = null;
-      renderFrecuentes();
-    }
+        const STORAGE_KEY = "cortex";
 
-    const input = document.getElementById('importeInput');
-    input.value = '';
-    input.focus();
-  }
 
-  function limpiarBuscador() {
-    document.getElementById('numClienteInput').value = '';
-  }
+        function obtenerEstado() {
 
-  function guardarEnLocalStorage() {
-    localStorage.setItem('caja_clientes', JSON.stringify(clientes));
-    localStorage.setItem('caja_netpay', JSON.stringify(clienteNetPay));
-  }
+            const raw = localStorage.getItem(STORAGE_KEY);
 
-  function buscarCliente() {
-    const numInput = document.getElementById('numClienteInput');
-    const valor = parseInt(numInput.value);
+            if (!raw) {
+                return crearEstadoInicial();
+            }
 
-    if (isNaN(valor)) return;
+            try {
 
-    const encontrado = clientes.find(c => c.num === valor);
+                const estado = JSON.parse(raw);
 
-    if (encontrado) {
-      seleccionarCliente(encontrado);
-    } else {
-      document.getElementById('numNoEncontradoTexto').innerText = valor;
-      document.getElementById('regNum').value = valor;
-      document.getElementById('modalRegistro').style.display = 'flex';
-      document.getElementById('opcionesIniciales').style.display = 'block';
-      document.getElementById('formRegistro').style.display = 'none';
-    }
-  }
+                return normalizarEstado(estado);
 
-  function renderFrecuentes() {
-    const container = document.getElementById('frequentContainer');
-    const seccion = document.getElementById('seccionFrecuentes');
-    container.innerHTML = '';
+            } catch (error) {
 
-    const frecuentes = [...clientes]
-      .filter(c => !c.esNetPay)
-      .sort((a, b) => b.transacciones - a.transacciones)
-      .slice(0, 8);
+                console.error(
+                    "Error leyendo datos de Cortex:",
+                    error
+                );
 
-    if (frecuentes.length > 0) {
-      seccion.style.display = 'block';
-      frecuentes.forEach(c => {
-        const div = document.createElement('div');
-        div.className = 'freq-card';
-        div.onclick = () => seleccionarCliente(c);
-        div.innerHTML = `
-          <div class="freq-title">${c.apodo}</div>
-          <div class="freq-sub">#${c.num}</div>
-        `;
-        container.appendChild(div);
-      });
-    } else {
-      seccion.style.display = 'none';
-    }
-  }
+                return crearEstadoInicial();
+            }
+        }
 
-  function mostrarFormularioRegistro() {
-    document.getElementById('opcionesIniciales').style.display = 'none';
-    document.getElementById('formRegistro').style.display = 'block';
-    document.getElementById('regNombre').focus();
-  }
 
-  function cerrarModal() {
-    document.getElementById('modalRegistro').style.display = 'none';
-  }
+        function guardarEstado(estado) {
 
-  function omitirRegistro() {
-    const num = parseInt(document.getElementById('regNum').value);
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(estado)
+            );
+        }
 
-    let clienteSinRegistro = {
-      num: num,
-      nombre: `Cliente #${num}`,
-      apodo: `#${num}`,
-      transacciones: 0,
-      total: 0.00
-    };
 
-    clientes.push(clienteSinRegistro);
-    guardarEnLocalStorage();
-    cerrarModal();
-    seleccionarCliente(clienteSinRegistro);
-  }
+        function crearEstadoInicial() {
 
-  function guardarCliente() {
-    const num = parseInt(document.getElementById('regNum').value);
-    const nombre = document.getElementById('regNombre').value.trim();
-    const apodo = document.getElementById('regApodo').value.trim();
+            return {
 
-    if (!nombre || !apodo) {
-      alert("Por favor llena todos los campos.");
-      return;
-    }
+                version: 1,
 
-    const nuevoCliente = {
-      num: num,
-      nombre: nombre,
-      apodo: apodo,
-      transacciones: 0,
-      total: 0.00
-    };
+                config: {
 
-    clientes.push(nuevoCliente);
-    guardarEnLocalStorage();
-    cerrarModal();
-    seleccionarCliente(nuevoCliente);
+                    precios: {
+                        magna: 23.89,
+                        premium: 25.39,
+                        diesel: 26.89
+                    },
 
-    document.getElementById('regNombre').value = '';
-    document.getElementById('regApodo').value = '';
-  }
+                    islandPresets: {
 
-  function seleccionarCliente(cliente) {
-    clienteSeleccionado = cliente;
-    document.getElementById('clienteActivoLabel').innerText = `Cliente: ${cliente.apodo} (#${cliente.num})`;
+                        "0": [1, 2, 3, 4, 5, 6, 7, 8],
 
-    const inputImporte = document.getElementById('importeInput');
-    inputImporte.value = '';
-    inputImporte.focus();
-  }
+                        "1": [1, 2],
 
-  function procesarImporte(event) {
-    if (event.key === 'Enter') {
-      const input = document.getElementById('importeInput');
-      const val = parseFloat(input.value);
+                        "2": [3, 4],
 
-      if (!isNaN(val) && val > 0 && clienteSeleccionado) {
-        clienteSeleccionado.transacciones += 1;
-        clienteSeleccionado.total += val;
-        
-        guardarEnLocalStorage();
-        renderFrecuentes();
-        actualizarResumenUI();
-        
-        input.value = '';
-      } else {
-        input.blur();
-      }
-    }
-  }
+                        "3": [3, 4, 5],
 
-  function actualizarResumenUI() {
-    const tbody = document.getElementById('resumenTablaBody');
-    tbody.innerHTML = '';
+                        "4": [1, 2, 3, 4, 5, 6, 7, 8],
 
-    let listaResumen = [];
-    if (clienteNetPay.transacciones > 0) listaResumen.push(clienteNetPay);
-    
-    const clientesFlotillasConTx = clientes.filter(c => c.transacciones > 0);
-    listaResumen = listaResumen.concat(clientesFlotillasConTx);
+                        "5": [1, 2, 3, 4, 5, 6, 7, 8],
 
-    const fmt = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+                        "6": [1, 2, 3, 4, 5, 6, 7, 8],
 
-    if (listaResumen.length > 0) {
-      document.getElementById('panelResumen').style.display = 'block';
+                        "7": [1, 2, 3, 4, 5, 6, 7, 8],
 
-      listaResumen.forEach(c => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${c.transacciones}</td>
-          <td><b>${c.esNetPay ? '-' : c.num}</b></td>
-          <td>${c.apodo}</td>
-          <td>${fmt.format(c.total)}</td>
-        `;
-        tbody.appendChild(row);
-      });
+                        "8": [1, 2, 3, 4, 5, 6, 7, 8],
 
-      const txFlotillas = clientesFlotillasConTx.reduce((sum, c) => sum + c.transacciones, 0);
-      const montoFlotillas = clientesFlotillasConTx.reduce((sum, c) => sum + c.total, 0);
+                        "9": [1, 2, 3, 4, 5, 6, 7, 8]
+                    }
 
-      const txNetPay = clienteNetPay.transacciones;
-      const montoNetPay = clienteNetPay.total;
+                },
 
-      const txGlobal = txFlotillas + txNetPay;
-      const montoGlobal = montoFlotillas + montoNetPay;
+                activeTurn: null,
 
-      document.getElementById('totalTxFlotillas').innerText = txFlotillas;
-      document.getElementById('totalMontoFlotillas').innerText = fmt.format(montoFlotillas);
+                turnData: null,
 
-      document.getElementById('totalTxNetPay').innerText = txNetPay;
-      document.getElementById('totalMontoNetPay').innerText = fmt.format(montoNetPay);
+                /*
+                 * Aquí podremos conservar posteriormente
+                 * una copia de las lecturas finales del turno
+                 * anterior para ofrecer:
+                 *
+                 * "Tomar finales como iniciales"
+                 *
+                 * sin mantener el turno anterior activo.
+                 */
+                lastTurnFinalReadings: null
+            };
+        }
 
-      document.getElementById('totalTxGlobal').innerText = txGlobal;
-      document.getElementById('totalMontoGlobal').innerText = fmt.format(montoGlobal);
 
-    } else {
-      document.getElementById('panelResumen').style.display = 'none';
-    }
-  }
+        function normalizarEstado(estado) {
 
-  function reiniciarTransacciones() {
-    if (confirm("¿Seguro que deseas reiniciar las transacciones a $0.00? Se conservarán los nombres de los clientes.")) {
-      clienteNetPay.transacciones = 0;
-      clienteNetPay.total = 0.00;
+            const base = crearEstadoInicial();
 
-      clientes.forEach(c => {
-        c.transacciones = 0;
-        c.total = 0.00;
-      });
+            if (!estado || typeof estado !== "object") {
+                return base;
+            }
 
-      guardarEnLocalStorage();
-      renderFrecuentes();
-      actualizarResumenUI();
-      
-      seleccionarModo('netpay');
-    }
-  }
-</script>
+            return {
+
+                ...base,
+
+                ...estado,
+
+                config: {
+                    ...base.config,
+                    ...(estado.config || {}),
+
+                    precios: {
+                        ...base.config.precios,
+                        ...(estado.config?.precios || {})
+                    },
+
+                    islandPresets: {
+                        ...base.config.islandPresets,
+                        ...(estado.config?.islandPresets || {})
+                    }
+                }
+
+            };
+        }
+
+
+        /* ============================================================
+           VARIABLES
+        ============================================================ */
+
+        let estado = obtenerEstado();
+
+
+        /* ============================================================
+           INICIALIZACIÓN
+        ============================================================ */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                guardarEstado(estado);
+
+                prepararIslas();
+
+                actualizarInterfaz();
+
+            }
+        );
+
+
+        /* ============================================================
+           ISLAS
+        ============================================================ */
+
+        function prepararIslas() {
+
+            const select =
+                document.getElementById("islandInput");
+
+            select.innerHTML = "";
+
+            for (let isla = 0; isla <= 9; isla++) {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = String(isla);
+
+                option.textContent =
+                    isla === 0
+                        ? "0 — Todos los dispensadores"
+                        : `Isla ${isla}`;
+
+                select.appendChild(option);
+            }
+
+            /*
+             * Por defecto utilizamos isla 1.
+             */
+            select.value = "1";
+
+            actualizarDispensadoresPreview();
+        }
+
+
+        function obtenerDispensadoresDeIsla(isla) {
+
+            const presets =
+                estado.config.islandPresets;
+
+            const dispensadores =
+                presets[String(isla)];
+
+            if (!Array.isArray(dispensadores)) {
+                return [];
+            }
+
+            return [
+                ...dispensadores
+            ].sort(
+                (a, b) => Number(a) - Number(b)
+            );
+        }
+
+
+        function actualizarDispensadoresPreview() {
+
+            const isla =
+                document.getElementById(
+                    "islandInput"
+                ).value;
+
+            const dispensadores =
+                obtenerDispensadoresDeIsla(isla);
+
+            const container =
+                document.getElementById(
+                    "dispenserPreview"
+                );
+
+            container.innerHTML = "";
+
+            if (!dispensadores.length) {
+
+                container.textContent =
+                    "No hay dispensadores configurados.";
+
+                return;
+            }
+
+            dispensadores.forEach(
+                numero => {
+
+                    const chip =
+                        document.createElement("div");
+
+                    chip.className =
+                        "dispenser-chip";
+
+                    chip.textContent =
+                        `Disp. ${numero}`;
+
+                    container.appendChild(chip);
+                }
+            );
+        }
+
+
+        /* ============================================================
+           INTERFAZ
+        ============================================================ */
+
+        function actualizarInterfaz() {
+
+            estado = obtenerEstado();
+
+            const hayTurno =
+                estado.activeTurn !== null;
+
+
+            const noTurnSection =
+                document.getElementById(
+                    "noTurnSection"
+                );
+
+            const activeTurnSection =
+                document.getElementById(
+                    "activeTurnSection"
+                );
+
+
+            if (hayTurno) {
+
+                noTurnSection.style.display =
+                    "none";
+
+                activeTurnSection.style.display =
+                    "block";
+
+                mostrarTurnoActivo();
+
+            } else {
+
+                noTurnSection.style.display =
+                    "block";
+
+                activeTurnSection.style.display =
+                    "none";
+            }
+
+
+            actualizarBotonesConTurno(
+                hayTurno
+            );
+        }
+
+
+        function mostrarTurnoActivo() {
+
+            const turno =
+                estado.activeTurn;
+
+
+            document.getElementById(
+                "activeIsland"
+            ).textContent =
+                turno.isla;
+
+
+            document.getElementById(
+                "activeShift"
+            ).textContent =
+                turno.turno;
+
+
+            const dispensadores =
+                Array.isArray(
+                    turno.dispensadores
+                )
+                    ? turno.dispensadores
+                    : [];
+
+
+            document.getElementById(
+                "activeDispensers"
+            ).textContent =
+                dispensadores.length
+                    ? `Dispensadores activos: ${dispensadores.join(", ")}`
+                    : "Sin dispensadores configurados";
+        }
+
+
+        function actualizarBotonesConTurno(
+            hayTurno
+        ) {
+
+            document
+                .querySelectorAll(
+                    "[data-requires-turn]"
+                )
+                .forEach(
+                    button => {
+
+                        button.classList.toggle(
+                            "disabled",
+                            !hayTurno
+                        );
+
+                    }
+                );
+        }
+
+
+        /* ============================================================
+           MODAL INICIAR TURNO
+        ============================================================ */
+
+        function abrirModalInicio() {
+
+            estado = obtenerEstado();
+
+            if (estado.activeTurn) {
+
+                mostrarToast(
+                    "Ya existe un turno activo."
+                );
+
+                return;
+            }
+
+
+            const precios =
+                estado.config.precios;
+
+
+            document.getElementById(
+                "magnaPrice"
+            ).value =
+                precios.magna;
+
+
+            document.getElementById(
+                "premiumPrice"
+            ).value =
+                precios.premium;
+
+
+            document.getElementById(
+                "dieselPrice"
+            ).value =
+                precios.diesel;
+
+
+            document.getElementById(
+                "shiftInput"
+            ).value = "";
+
+
+            document.getElementById(
+                "islandInput"
+            ).value = "1";
+
+
+            actualizarDispensadoresPreview();
+
+
+            document.getElementById(
+                "startModal"
+            ).classList.add("visible");
+        }
+
+
+        function cerrarModalInicio() {
+
+            document.getElementById(
+                "startModal"
+            ).classList.remove("visible");
+        }
+
+
+        function cerrarModalDesdeFondo(event) {
+
+            if (
+                event.target ===
+                document.getElementById("startModal")
+            ) {
+
+                cerrarModalInicio();
+
+            }
+        }
+
+
+        /* ============================================================
+           INICIAR TURNO
+        ============================================================ */
+
+        function iniciarTurno() {
+
+            estado = obtenerEstado();
+
+
+            if (estado.activeTurn) {
+
+                mostrarToast(
+                    "Ya existe un turno activo."
+                );
+
+                cerrarModalInicio();
+
+                actualizarInterfaz();
+
+                return;
+            }
+
+
+            const isla =
+                Number(
+                    document.getElementById(
+                        "islandInput"
+                    ).value
+                );
+
+
+            const turno =
+                document.getElementById(
+                    "shiftInput"
+                ).value.trim();
+
+
+            const magna =
+                Number(
+                    document.getElementById(
+                        "magnaPrice"
+                    ).value
+                );
+
+
+            const premium =
+                Number(
+                    document.getElementById(
+                        "premiumPrice"
+                    ).value
+                );
+
+
+            const diesel =
+                Number(
+                    document.getElementById(
+                        "dieselPrice"
+                    ).value
+                );
+
+
+            /* =========================
+               VALIDACIONES
+            ========================== */
+
+            if (!turno) {
+
+                mostrarToast(
+                    "Indica el número de turno."
+                );
+
+                document
+                    .getElementById("shiftInput")
+                    .focus();
+
+                return;
+            }
+
+
+            if (
+                !Number.isFinite(magna) ||
+                magna < 0
+            ) {
+
+                mostrarToast(
+                    "Precio de Magna inválido."
+                );
+
+                return;
+            }
+
+
+            if (
+                !Number.isFinite(premium) ||
+                premium < 0
+            ) {
+
+                mostrarToast(
+                    "Precio de Premium inválido."
+                );
+
+                return;
+            }
+
+
+            if (
+                !Number.isFinite(diesel) ||
+                diesel < 0
+            ) {
+
+                mostrarToast(
+                    "Precio de Diesel inválido."
+                );
+
+                return;
+            }
+
+
+            const dispensadores =
+                obtenerDispensadoresDeIsla(
+                    isla
+                );
+
+
+            if (!dispensadores.length) {
+
+                mostrarToast(
+                    "La isla no tiene dispensadores configurados."
+                );
+
+                return;
+            }
+
+
+            /* =========================
+               GUARDAR PRECIOS
+               Los precios son permanentes.
+            ========================== */
+
+            estado.config.precios = {
+
+                magna: magna,
+
+                premium: premium,
+
+                diesel: diesel
+
+            };
+
+
+            /* =========================
+               CREAR TURNO
+            ========================== */
+
+            const now =
+                new Date();
+
+
+            estado.activeTurn = {
+
+                id: now.getTime(),
+
+                isla: isla,
+
+                turno: turno,
+
+                dispensadores: dispensadores,
+
+                precios: {
+
+                    magna: magna,
+
+                    premium: premium,
+
+                    diesel: diesel
+
+                },
+
+                iniciadoEn:
+                    now.toISOString()
+
+            };
+
+
+            /* =========================
+               DATOS DEL TURNO
+            ========================== */
+
+            estado.turnData = {
+
+                readings: {},
+
+                transactions: [],
+
+                createdAt:
+                    now.toISOString()
+
+            };
+
+
+            guardarEstado(estado);
+
+
+            cerrarModalInicio();
+
+
+            actualizarInterfaz();
+
+
+            mostrarToast(
+                `Turno ${turno} iniciado correctamente.`
+            );
+        }
+
+
+        /* ============================================================
+           CERRAR TURNO
+        ============================================================ */
+
+        function confirmarCierre() {
+
+            estado = obtenerEstado();
+
+
+            if (!estado.activeTurn) {
+
+                mostrarToast(
+                    "No hay un turno activo."
+                );
+
+                return;
+            }
+
+
+            document.getElementById(
+                "closeModal"
+            ).classList.add("visible");
+        }
+
+
+        function cerrarConfirmacion() {
+
+            document.getElementById(
+                "closeModal"
+            ).classList.remove("visible");
+        }
+
+
+        function cerrarConfirmacionDesdeFondo(
+            event
+        ) {
+
+            if (
+                event.target ===
+                document.getElementById("closeModal")
+            ) {
+
+                cerrarConfirmacion();
+
+            }
+        }
+
+
+        function cerrarTurno() {
+
+            estado = obtenerEstado();
+
+
+            if (!estado.activeTurn) {
+
+                cerrarConfirmacion();
+
+                actualizarInterfaz();
+
+                return;
+            }
+
+
+            /*
+             * Antes de eliminar los datos del turno,
+             * guardamos únicamente las lecturas finales.
+             *
+             * Esto permitirá posteriormente ofrecer
+             * "Tomar finales como iniciales" al iniciar
+             * el siguiente turno.
+             *
+             * No se conserva ninguna transacción.
+             */
+
+            if (
+                estado.turnData &&
+                estado.turnData.readings
+            ) {
+
+                estado.lastTurnFinalReadings =
+                    extraerLecturasFinales(
+                        estado.turnData.readings
+                    );
+
+            } else {
+
+                estado.lastTurnFinalReadings =
+                    null;
+            }
+
+
+            /*
+             * Eliminar información exclusiva
+             * del turno.
+             */
+
+            estado.activeTurn = null;
+
+            estado.turnData = null;
+
+
+            /*
+             * Los datos permanentes permanecen:
+             *
+             * - clientes
+             * - precios
+             * - presets
+             * - configuración
+             */
+
+            guardarEstado(estado);
+
+
+            cerrarConfirmacion();
+
+
+            actualizarInterfaz();
+
+
+            mostrarToast(
+                "Turno cerrado correctamente."
+            );
+        }
+
+
+        /* ============================================================
+           LECTURAS FINALES
+        ============================================================ */
+
+        function extraerLecturasFinales(
+            readings
+        ) {
+
+            const finales = {};
+
+
+            if (
+                !readings ||
+                typeof readings !== "object"
+            ) {
+
+                return finales;
+            }
+
+
+            /*
+             * Esta función queda preparada para la
+             * estructura que construiremos en lecturas.html.
+             *
+             * Ejemplo esperado:
+             *
+             * readings: {
+             *   "1": {
+             *      magna: {
+             *          inicial: 100,
+             *          final: 200
+             *      },
+             *      premium: {
+             *          inicial: 100,
+             *          final: 200
+             *      }
+             *   }
+             * }
+             */
+
+            Object.entries(
+                readings
+            ).forEach(
+                ([dispensador, datos]) => {
+
+                    finales[dispensador] = {};
+
+
+                    if (
+                        datos.magna &&
+                        datos.magna.final !== undefined
+                    ) {
+
+                        finales[
+                            dispensador
+                        ].magna =
+                            datos.magna.final;
+                    }
+
+
+                    if (
+                        datos.premium &&
+                        datos.premium.final !== undefined
+                    ) {
+
+                        finales[
+                            dispensador
+                        ].premium =
+                            datos.premium.final;
+                    }
+
+
+                    if (
+                        datos.diesel &&
+                        datos.diesel.final !== undefined
+                    ) {
+
+                        finales[
+                            dispensador
+                        ].diesel =
+                            datos.diesel.final;
+                    }
+
+                }
+            );
+
+
+            return finales;
+        }
+
+
+        /* ============================================================
+           NAVEGACIÓN
+        ============================================================ */
+
+        function irA(pagina) {
+
+            const requiereTurno =
+                pagina === "caja.html" ||
+                pagina === "lecturas.html";
+
+
+            estado = obtenerEstado();
+
+
+            if (
+                requiereTurno &&
+                !estado.activeTurn
+            ) {
+
+                mostrarToast(
+                    "Primero debes iniciar un turno."
+                );
+
+
+                setTimeout(
+                    () => {
+                        abrirModalInicio();
+                    },
+                    250
+                );
+
+
+                return;
+            }
+
+
+            window.location.href =
+                pagina;
+        }
+
+
+        /* ============================================================
+           UTILIDADES
+        ============================================================ */
+
+        let toastTimer = null;
+
+
+        function mostrarToast(
+            mensaje
+        ) {
+
+            const toast =
+                document.getElementById(
+                    "toast"
+                );
+
+
+            toast.textContent =
+                mensaje;
+
+
+            toast.classList.add(
+                "visible"
+            );
+
+
+            clearTimeout(
+                toastTimer
+            );
+
+
+            toastTimer =
+                setTimeout(
+                    () => {
+
+                        toast.classList.remove(
+                            "visible"
+                        );
+
+                    },
+                    2500
+                );
+        }
+
+
+        /* ============================================================
+           EVITAR DOBLE ENVÍO CON ENTER
+        ============================================================ */
+
+        document.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key !== "Enter"
+                ) {
+                    return;
+                }
+
+
+                const startModal =
+                    document.getElementById(
+                        "startModal"
+                    );
+
+
+                if (
+                    startModal.classList.contains(
+                        "visible"
+                    )
+                ) {
+
+                    const active =
+                        document.activeElement;
+
+
+                    /*
+                     * No iniciar automáticamente desde
+                     * un campo de precio.
+                     */
+                    if (
+                        active &&
+                        active.tagName === "INPUT" &&
+                        active.type === "number"
+                    ) {
+
+                        return;
+                    }
+
+
+                    iniciarTurno();
+                }
+
+            }
+        );
+    </script>
 
 </body>
 </html>
