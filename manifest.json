@@ -1,21 +1,36 @@
-{
-  "short_name": "CajaPWA",
-  "name": "Caja Registradora PWA",
-  "icons": [
+const manifest = {
+  name: "Cortex",
+  short_name: "Cortex",
+  description: "Sistema de control, caja, clientes y lecturas para turnos de gasolinera.",
+  start_url: "./index.html",
+  display: "standalone",
+  background_color: "#f1f4f5",
+  theme_color: "#ffffff",
+  orientation: "portrait",
+  icons: [
     {
-      "src": "icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      src: "./icon-192.png",
+      sizes: "192x192",
+      type: "image/png",
+      purpose: "any"
     },
     {
-      "src": "icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      src: "./icon-512.png",
+      sizes: "512x512",
+      type: "image/png",
+      purpose: "any"
     }
-  ],
-  "start_url": "./index.html",
-  "background_color": "#121214",
-  "theme_color": "#121214",
-  "display": "standalone",
-  "orientation": "portrait"
-}
+  ]
+};
+
+const manifestBlob = new Blob([JSON.stringify(manifest, null, 2)], {
+  type: "application/manifest+json"
+});
+
+const manifestUrl = URL.createObjectURL(manifestBlob);
+
+const link = document.createElement("link");
+link.rel = "manifest";
+link.href = manifestUrl;
+
+document.head.appendChild(link);
