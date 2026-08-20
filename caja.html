@@ -82,7 +82,7 @@
 
             min-height: 100vh;
 
-            padding-bottom: 90px;
+            padding-bottom: 20px;
         }
 
 
@@ -1234,104 +1234,6 @@
 
 
         /* =========================================
-           BOTTOM NAV
-        ========================================== */
-
-        .bottom-nav {
-
-            position: fixed;
-
-            left: 0;
-
-            right: 0;
-
-            bottom: 0;
-
-            z-index: 50;
-
-            height: 74px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            background:
-                rgba(255, 255, 255, 0.97);
-
-            border-top:
-                1px solid rgba(0, 0, 0, 0.06);
-
-            padding:
-                8px 18px
-                calc(
-                    8px +
-                    env(safe-area-inset-bottom)
-                );
-        }
-
-
-        .bottom-nav-inner {
-
-            width: 100%;
-
-            max-width: 500px;
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(3, 1fr);
-
-            gap: 8px;
-        }
-
-
-        .nav-button {
-
-            height: 54px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            gap: 7px;
-
-            background: transparent;
-
-            border-radius: 30px;
-
-            color: #111;
-
-            font-size: 23px;
-        }
-
-
-        .nav-button.active {
-
-            background: #d9f0ff;
-
-            color: var(--blue);
-
-            font-size: 16px;
-        }
-
-
-        .nav-button span {
-
-            display: none;
-        }
-
-
-        .nav-button.active span {
-
-            display: inline;
-        }
-
-
-        /* =========================================
            DESKTOP
         ========================================== */
 
@@ -1340,12 +1242,6 @@
             body {
 
                 padding-bottom: 20px;
-            }
-
-
-            .bottom-nav {
-
-                display: none;
             }
 
 
@@ -2215,50 +2111,6 @@
     </div>
 
 
-    <!-- =========================================
-         BOTTOM NAV
-    ========================================== -->
-
-    <nav class="bottom-nav">
-
-        <div class="bottom-nav-inner">
-
-
-            <button
-                type="button"
-                class="nav-button active"
-                aria-label="Caja"
-            >
-                🧾
-                <span>Caja</span>
-            </button>
-
-
-            <button
-                type="button"
-                class="nav-button"
-                onclick="irA('lecturas.html')"
-                aria-label="Corte"
-            >
-                📄
-                <span>Corte</span>
-            </button>
-
-
-            <button
-                type="button"
-                class="nav-button"
-                onclick="irA('config.html')"
-                aria-label="Menú"
-            >
-                ☰
-            </button>
-
-        </div>
-
-    </nav>
-
-
     <script>
 
         /*
@@ -2542,6 +2394,10 @@
                 guardarEstado();
             }
 
+            if (sincronizarFrecuencias()) {
+                guardarEstado();
+            }
+
 
             mostrarTurno();
 
@@ -2641,6 +2497,55 @@
 
 
             return estado.turnData.transactions;
+        }
+
+
+        function registrarFrecuenciaCliente(
+            numeroCliente,
+            monto
+        ) {
+
+            const cliente =
+                encontrarCliente(numeroCliente);
+
+            if (!cliente) {
+                return false;
+            }
+
+            cliente.transacciones =
+                Number(cliente.transacciones || 0) + 1;
+
+            cliente.total =
+                Number(cliente.total || 0) + Number(monto || 0);
+
+            return true;
+        }
+
+
+        function sincronizarFrecuencias() {
+
+            let actualizadas = false;
+
+            obtenerTransacciones().forEach(transaction => {
+                if (
+                    transaction.tipo !== "flotilla" ||
+                    transaction.frecuenciaRegistrada
+                ) {
+                    return;
+                }
+
+                if (
+                    registrarFrecuenciaCliente(
+                        transaction.numeroCliente,
+                        transaction.monto
+                    )
+                ) {
+                    transaction.frecuenciaRegistrada = true;
+                    actualizadas = true;
+                }
+            });
+
+            return actualizadas;
         }
 
 
@@ -3366,6 +3271,16 @@
 
             };
 
+            if (
+                datos.tipo === "flotilla" &&
+                registrarFrecuenciaCliente(
+                    transaccion.numeroCliente,
+                    transaccion.monto
+                )
+            ) {
+                transaccion.frecuenciaRegistrada = true;
+            }
+
 
             estado.turnData.transactions.unshift(
                 transaccion
@@ -3628,76 +3543,18 @@
         ============================================================ */
 
         function obtenerResumenClientes() {
-
-            const flotillas =
-                obtenerTransacciones()
-                    .filter(
-
-                        transaction =>
-
-                            transaction.tipo ===
-                            "flotilla" &&
-
-                            transaction.numeroCliente !==
-                                null &&
-
-                            transaction.numeroCliente !==
-                                undefined
-
-                    );
-
-
             const mapa =
                 new Map();
 
+            obtenerClientes().forEach(cliente => {
+                const numero = String(cliente.numeroCliente);
 
-            flotillas.forEach(
-                transaction => {
-
-                    const numero =
-                        String(
-                            transaction.numeroCliente
-                        );
-
-
-                    if (!mapa.has(numero)) {
-
-                        mapa.set(
-
-                            numero,
-
-                            {
-
-                                numeroCliente:
-                                    transaction.numeroCliente,
-
-                                transacciones:
-                                    0,
-
-                                total:
-                                    0
-
-                            }
-
-                        );
-                    }
-
-
-                    const item =
-                        mapa.get(numero);
-
-
-                    item.transacciones +=
-                        1;
-
-
-                    item.total +=
-                        Number(
-                            transaction.monto || 0
-                        );
-
-                }
-            );
+                mapa.set(numero, {
+                    numeroCliente: cliente.numeroCliente,
+                    transacciones: Number(cliente.transacciones || 0),
+                    total: Number(cliente.total || 0)
+                });
+            });
 
 
             return Array.from(
@@ -3732,6 +3589,39 @@
         }
 
 
+        function obtenerResumenClientesDelTurno() {
+
+            const mapa = new Map();
+
+            obtenerTransacciones()
+                .filter(transaction =>
+                    transaction.tipo === "flotilla" &&
+                    transaction.numeroCliente !== null &&
+                    transaction.numeroCliente !== undefined
+                )
+                .forEach(transaction => {
+                    const numero = String(transaction.numeroCliente);
+                    const item = mapa.get(numero) || {
+                        numeroCliente: transaction.numeroCliente,
+                        transacciones: 0,
+                        total: 0
+                    };
+
+                    item.transacciones += 1;
+                    item.total += Number(transaction.monto || 0);
+                    mapa.set(numero, item);
+                });
+
+            return Array.from(mapa.values()).sort((a, b) => {
+                if (b.transacciones !== a.transacciones) {
+                    return b.transacciones - a.transacciones;
+                }
+
+                return b.total - a.total;
+            });
+        }
+
+
         function renderizarFrecuentes() {
 
             const container =
@@ -3751,8 +3641,8 @@
 
                     <div class="empty-message">
 
-                        Aún no hay clientes de flotilla
-                        registrados en este turno.
+                        Aún no hay clientes registrados
+                        en la aplicación.
 
                     </div>
 
@@ -4467,7 +4357,7 @@
 
 
             const resumen =
-                obtenerResumenClientes();
+                obtenerResumenClientesDelTurno();
 
 
             if (!resumen.length) {
