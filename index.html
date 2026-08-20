@@ -10,8 +10,7 @@
 
     <title>Cortex</title>
 
-    <!-- Más adelante podemos conectar aquí manifest.json -->
-    <!-- <link rel="manifest" href="manifest.json"> -->
+    <script src="manifest.js" defer></script>
 
     <style>
         * {
@@ -124,6 +123,13 @@
             margin: 0;
             color: var(--muted);
             font-size: 15px;
+        }
+
+        .beta-legend {
+            margin: 24px 0 8px;
+            color: var(--muted);
+            font-size: 12px;
+            text-align: center;
         }
 
         /* =========================
@@ -351,71 +357,6 @@
 
         .primary-button:active {
             background: var(--blue-dark);
-        }
-
-        /* =========================
-           BOTTOM NAV
-        ========================= */
-
-        .bottom-nav {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 30;
-
-            height: 74px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background: rgba(255, 255, 255, 0.97);
-            border-top: 1px solid rgba(0, 0, 0, 0.06);
-
-            padding:
-                8px 18px
-                calc(8px + env(safe-area-inset-bottom));
-        }
-
-        .bottom-nav-inner {
-            width: 100%;
-            max-width: 500px;
-
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-button {
-            height: 54px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-
-            background: transparent;
-            border-radius: 30px;
-
-            color: #111;
-            font-size: 24px;
-        }
-
-        .nav-button.active {
-            background: #d9f0ff;
-            color: var(--blue);
-
-            font-size: 16px;
-        }
-
-        .nav-button span {
-            display: none;
-        }
-
-        .nav-button.active span {
-            display: inline;
         }
 
         /* =========================
@@ -673,14 +614,6 @@
         ========================= */
 
         @media (min-width: 700px) {
-            body {
-                padding-bottom: 20px;
-            }
-
-            .bottom-nav {
-                display: none;
-            }
-
             main {
                 padding-top: 35px;
             }
@@ -955,51 +888,11 @@
 
         </section>
 
-    </main>
-
-
-    <!-- =========================
-         NAVEGACIÓN INFERIOR
-    ========================== -->
-
-    <nav class="bottom-nav">
-
-        <div class="bottom-nav-inner">
-
-            <button
-                type="button"
-                class="nav-button"
-                onclick="irA('caja.html')"
-                data-requires-turn
-                aria-label="Caja"
-            >
-                🧾
-                <span>Caja</span>
-            </button>
-
-
-            <button
-                type="button"
-                class="nav-button active"
-                aria-label="Corte"
-            >
-                📄
-                <span>Corte</span>
-            </button>
-
-
-            <button
-                type="button"
-                class="nav-button"
-                onclick="irA('config.html')"
-                aria-label="Menú"
-            >
-                ☰
-            </button>
-
+        <div class="beta-legend">
+            App Beta, DEV RDZ, Beta 1.08.26, Puede contener errores
         </div>
 
-    </nav>
+    </main>
 
 
     <!-- =========================
