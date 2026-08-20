@@ -166,6 +166,17 @@ input:focus{
 .summary-row:last-child{border-bottom:0}
 .summary-row span:first-child{color:var(--muted)}
 .summary-row strong{font-size:16px}
+.summary-values{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:2px;
+}
+.summary-values small{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:400;
+}
 .total-row{
   margin-top:4px;
   padding-top:14px;
@@ -249,17 +260,26 @@ button{
         <span class="badge">Turno actual</span>
       </div>
 
-      <div class="summary-row">
-        <span>Magna</span>
-        <strong id="summaryMagna">$0.00</strong>
+        <div class="summary-row">
+          <span>Magna</span>
+          <div class="summary-values">
+            <strong id="summaryMagna">$0.00</strong>
+            <small id="summaryMagnaLiters">0.00 L</small>
+          </div>
       </div>
       <div class="summary-row">
         <span>Premium</span>
-        <strong id="summaryPremium">$0.00</strong>
+          <div class="summary-values">
+            <strong id="summaryPremium">$0.00</strong>
+            <small id="summaryPremiumLiters">0.00 L</small>
+          </div>
       </div>
       <div class="summary-row">
         <span>Diesel</span>
-        <strong id="summaryDiesel">$0.00</strong>
+          <div class="summary-values">
+            <strong id="summaryDiesel">$0.00</strong>
+            <small id="summaryDieselLiters">0.00 L</small>
+          </div>
       </div>
       <div class="summary-row">
         <span>Total litros</span>
@@ -280,13 +300,23 @@ button{
         <span>Total</span>
         <strong id="summaryTotal">$0.00</strong>
       </div>
+
+      <div class="summary-row aditivos">
+        <span>Total Sistema</span>
+        <input id="totalSistema" type="text" inputmode="decimal" placeholder="0.00">
+      </div>
+
+      <div id="diferenciaRow" class="summary-row hidden">
+        <span>Diferencia</span>
+        <strong id="summaryDiferencia">$0.00</strong>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">
+    <details class="card">
+      <summary class="card-title">
         <h2>Precios del turno</h2>
         <span class="badge">Guardados permanentemente</span>
-      </div>
+      </summary>
       <div class="grid">
         <div class="field">
           <label>Magna ($/L)</label>
@@ -300,7 +330,8 @@ button{
           <label>Diesel ($/L)</label>
           <input id="priceDiesel" type="number" min="0" step="0.001" inputmode="decimal">
         </div>
-      </div>
+        </div>
+    </details>
     </div>
 
     <div class="actions">
@@ -388,7 +419,8 @@ function guardarEstado() {
 }
 
 function numero(value) {
-  const n = Number(value);
+  const normalized = String(value ?? "").replace(",", ".");
+  const n = Number(normalized);
   return Number.isFinite(n) ? n : 0;
 }
 
@@ -669,11 +701,6 @@ function productoHTML(id, producto, nombre, precio) {
           <small>Litros</small>
           <strong id="litros-${id}-${producto}">0.00 L</strong>
         </div>
-
-        <div class="result">
-          <small>Total</small>
-          <strong id="total-${id}-${producto}">$0.00</strong>
-        </div>
       </div>
     </div>
   `;
@@ -681,6 +708,12 @@ function productoHTML(id, producto, nombre, precio) {
 
 function conectarInputs() {
   document.querySelectorAll(".reading-input").forEach(input => {
+    input.addEventListener("focus", () => {
+      if (input.value === "0") {
+        input.value = "";
+      }
+    });
+
     input.addEventListener("input", () => {
       const pump = input.dataset.pump;
       const product = input.dataset.product;
@@ -748,19 +781,9 @@ function recalcularProducto(pump, producto) {
       `litros-${pump}-${producto}`
     );
 
-  const totalEl =
-    document.getElementById(
-      `total-${pump}-${producto}`
-    );
-
   if (litrosEl) {
     litrosEl.textContent =
       liters(resultado.litros);
-  }
-
-  if (totalEl) {
-    totalEl.textContent =
-      money(resultado.total);
   }
 }
 
@@ -772,6 +795,9 @@ function obtenerResumen() {
   let magna = 0;
   let premium = 0;
   let diesel = 0;
+  let magnaLiters = 0;
+  let premiumLiters = 0;
+  let dieselLiters = 0;
   let totalLitros = 0;
 
   Object.keys(lecturas).forEach(pump => {
@@ -785,6 +811,9 @@ function obtenerResumen() {
       if (producto === "magna") magna += r.total;
       if (producto === "premium") premium += r.total;
       if (producto === "diesel") diesel += r.total;
+      if (producto === "magna") magnaLiters += r.litros;
+      if (producto === "premium") premiumLiters += r.litros;
+      if (producto === "diesel") dieselLiters += r.litros;
 
       totalLitros += r.litros;
     });
@@ -802,6 +831,9 @@ function obtenerResumen() {
     magna,
     premium,
     diesel,
+    magnaLiters,
+    premiumLiters,
+    dieselLiters,
     totalLitros,
     venta,
     aditivos,
@@ -815,11 +847,20 @@ function renderSummary() {
   document.getElementById("summaryMagna").textContent =
     money(r.magna);
 
+  document.getElementById("summaryMagnaLiters").textContent =
+    liters(r.magnaLiters);
+
   document.getElementById("summaryPremium").textContent =
     money(r.premium);
 
+  document.getElementById("summaryPremiumLiters").textContent =
+    liters(r.premiumLiters);
+
   document.getElementById("summaryDiesel").textContent =
     money(r.diesel);
+
+  document.getElementById("summaryDieselLiters").textContent =
+    liters(r.dieselLiters);
 
   document.getElementById("summaryLiters").textContent =
     liters(r.totalLitros);
@@ -832,6 +873,19 @@ function renderSummary() {
 
   document.getElementById("summaryTotal").textContent =
     money(r.total);
+
+  const totalSistema = estado.turnData?.totalSistema;
+  const totalSistemaInput = document.getElementById("totalSistema");
+  const diferenciaRow = document.getElementById("diferenciaRow");
+  const tieneTotalSistema = totalSistema !== undefined && totalSistema !== null && totalSistema !== "";
+
+  totalSistemaInput.value = tieneTotalSistema ? totalSistema : "";
+  diferenciaRow.classList.toggle("hidden", !tieneTotalSistema);
+
+  if (tieneTotalSistema) {
+    document.getElementById("summaryDiferencia").textContent =
+      money(numero(totalSistema) - r.venta);
+  }
 }
 
 /* ============================================================
@@ -857,6 +911,14 @@ function guardarLecturas() {
       numero(aditivos.value);
   }
 
+  const totalSistema =
+    document.getElementById("totalSistema");
+
+  if (totalSistema) {
+    estado.turnData.totalSistema =
+      totalSistema.value;
+  }
+
   guardarEstado();
 }
 
@@ -874,6 +936,8 @@ function guardarTodo() {
   estado.turnData.readings = lecturas;
   estado.turnData.aditivos =
     numero(document.getElementById("aditivos").value);
+  estado.turnData.totalSistema =
+    document.getElementById("totalSistema").value;
 
   guardarEstado();
 
@@ -950,6 +1014,18 @@ function iniciarLecturas() {
 
       estado.turnData.aditivos =
         numero(document.getElementById("aditivos").value);
+
+      guardarEstado();
+      renderSummary();
+    });
+
+  document
+    .getElementById("totalSistema")
+    .addEventListener("input", () => {
+      if (!estado.turnData) return;
+
+      estado.turnData.totalSistema =
+        document.getElementById("totalSistema").value;
 
       guardarEstado();
       renderSummary();
