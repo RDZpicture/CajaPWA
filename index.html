@@ -862,6 +862,48 @@
             </button>
 
 
+            <!-- RESUMEN -->
+
+            <button
+                type="button"
+                class="menu-button"
+                onclick="irA('cortex.html')"
+            >
+                <div class="menu-icon">
+                    📊
+                </div>
+
+                <div class="menu-label">
+                    Resumen
+                </div>
+
+                <div class="menu-description">
+                    Resumen general
+                </div>
+            </button>
+
+
+            <!-- ACCESS -->
+
+            <button
+                type="button"
+                class="menu-button"
+                onclick="irAAccess()"
+            >
+                <div class="menu-icon">
+                    🔐
+                </div>
+
+                <div class="menu-label">
+                    Access
+                </div>
+
+                <div class="menu-description">
+                    Generador
+                </div>
+            </button>
+
+
             <!-- CERRAR TURNO -->
 
             <button
@@ -889,7 +931,7 @@
         </section>
 
         <div class="beta-legend">
-            App Beta, DEV RDZ, Beta 1.08.26, Puede contener errores
+            App Beta, DEV RDZ, Beta 26.08.26, Puede contener errores
         </div>
 
     </main>
@@ -2064,6 +2106,29 @@
 
             window.location.href =
                 pagina;
+        }
+
+
+        function irAAccess() {
+
+            const clave =
+                prompt(
+                    "Ingresa la clave de acceso:"
+                );
+
+
+            if (clave !== "124069") {
+
+                mostrarToast(
+                    "Clave incorrecta."
+                );
+
+                return;
+            }
+
+
+            window.location.href =
+                "generator.html";
         }
 
 
