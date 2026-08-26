@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pre-Corte Promotores</title>
+  <style>
+    @page {
+      size: Letter;
+      margin: 0.15in;
+    }
+
+    :root {
+      --border: #111;
+      --text: #111;
+      --muted: #333;
+      --soft: #f4f4f4;
+      --bg: #fff;
+      --green: #0a8f3d;
+      --red: #c62828;
+      --blue: #0d213b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      width: 100%;
+      min-height: 11in;
+      background: #fff;
+    }
+
+    .app-topbar {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: rgba(255, 255, 255, 0.97);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .app-topbar .logo {
+      color: var(--text);
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      text-decoration: none;
+    }
+
+    .app-topbar .logo span {
+      color: #2196f3;
+    }
+
+    .print-button {
+      border: 0;
+      border-radius: 11px;
+      padding: 10px 15px;
+      background: #2196f3;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .print-button:hover {
+      background: #1976d2;
+    }
+
+    .page {
+      width: 8.5in;
+      min-height: 11in;
+      padding: 0.26in 0.28in 0.2in;
+      position: relative;
+      background: #fff;
+      page-break-after: always;
+      overflow: hidden;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.2in;
+      margin-bottom: 0.08in;
+      padding-bottom: 0.04in;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.06;
+    }
+
+    .brand .name {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 0.9;
+      margin: 0;
+    }
+
+    .brand .subtitle {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .brand .subtext {
+      font-size: 9px;
+      letter-spacing: 0.03em;
+      margin-top: 2px;
+    }
+
+    .doc-meta {
+      font-size: 9px;
+      line-height: 1.5;
+      text-align: right;
+      padding-top: 2px;
+      white-space: nowrap;
+    }
+
+    .header-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1.1fr 1.3fr;
+      gap: 0.08in;
+      margin-top: 0.08in;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .header-field {
+      padding: 0.05in 0.06in;
+      border-right: 1px solid var(--border);
+      min-height: 0.28in;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-field:last-child {
+      border-right: none;
+    }
+
+    .header-field .label {
+      font-weight: 700;
+      margin-right: 0.06in;
+      white-space: nowrap;
+    }
+
+    .header-field .value {
+      font-weight: 400;
+      display: inline-block;
+      min-width: 0.1in;
+    }
+
+    .content {
+      margin-top: 0.12in;
+      display: block;
+    }
+
+    .lower-row {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 0.12in;
+      align-items: flex-start;
+      margin-top: 0.12in;
+    }
+
+    .left-panel {
+      display: grid;
+      gap: 0.08in;
+      align-self: flex-start;
+      min-width: 0;
+      margin: 0;
+    }
+
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0.12in;
+      padding-left: 0;
+      align-self: flex-start;
+      width: 100%;
+      max-width: 4.1in;
+      margin: 0 0 0 auto;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      margin: 0 0 0.04in;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .readings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.08in;
+    }
+
+    .reading-box {
+      border: 1px solid var(--border);
+      padding: 0.06in;
+      background: #fff;
+    }
+
+    .reading-box.diesel-full {
+      grid-column: 1 / -1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 9px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.04in 0.03in;
+      vertical-align: middle;
+      text-align: center;
+      height: 0.2in;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    th {
+      font-size: 8.5px;
+      font-weight: 700;
+      background: #f9f9f9;
+    }
+
+    td.num {
+      text-align: right;
+      padding-right: 0.07in;
+    }
+
+    .reading-box .total-line {
+      margin-top: 0.06in;
+      font-size: 9px;
+      font-weight: 700;
+      text-align: left;
+      padding-top: 0.04in;
+      border-top: 1px solid var(--border);
+    }
+
+    .sale-box {
+      border: 1px solid var(--border);
+      padding: 0.06in 0.06in 0.04in;
+      background: #fff;
+    }
+
+    .sale-table th,
+    .sale-table td {
+      height: 0.22in;
+      font-size: 9px;
+    }
+
+    .sale-table th:first-child,
+    .sale-table td:first-child {
+      width: 54%;
+      text-align: left;
+      padding-left: 0.06in;
+    }
+
+    .sale-table td:nth-child(2),
+    .sale-table td:nth-child(3) {
+      width: 23%;
+      text-align: right;
+      padding-right: 0.05in;
+    }
+
+    .sale-table td.total-sum {
+      font-weight: 700;
+    }
+
+    .difference-row {
+      margin-top: 0.08in;
+      border: 1px solid var(--border);
+      padding: 0.06in;
+      font-size: 9px;
+      font-weight: 700;
+      background: #fff;
+    }
+
+    .difference-row .label {
+      display: inline-block;
+      margin-right: 0.08in;
+    }
+
+    .signature-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.08in;
+      margin-top: 0.12in;
+    }
+
+    .signature-box {
+      border: 1px solid var(--border);
+      min-height: 0.72in;
+      padding: 0.05in 0.06in 0.02in;
+      font-size: 9px;
+      background: #fff;
+    }
+
+    .signature-box .line {
+      border-top: 1px solid var(--border);
+      margin-top: 0.38in;
+      height: 0.1in;
+    }
+
+    .field-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.03in;
+      font-size: 9px;
+      line-height: 1.1;
+      width: 100%;
+      max-width: 4.1in;
+      margin: 0;
+    }
+
+    .field-list .row {
+      display: grid;
+      grid-template-columns: 1.95fr 0.9fr;
+      gap: 0.04in;
+      align-items: center;
+      min-height: 0.18in;
+    }
+
+    .field-list .row .label {
+      text-align: left;
+      font-weight: 700;
+      padding-left: 0.02in;
+    }
+
+    .field-list .row .value {
+      text-align: right;
+      padding-right: 0.02in;
+      min-height: 0.18in;
+      border-bottom: 1px solid transparent;
+      font-weight: 700;
+    }
+
+    .field-list .row.big-value .value {
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .field-list .row.total-line {
+      margin-top: 0.04in;
+      padding-top: 0.05in;
+      border-top: 1px solid var(--border);
+    }
+
+    .field-list .row.total-line .value {
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .field-list .row.total-line .value.green {
+      color: var(--green);
+    }
+
+    .field-list .row.total-line .value.red {
+      color: var(--red);
+    }
+
+    .account-group {
+      display: grid;
+      grid-template-columns: 0.42in 1fr;
+      border: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .account-group + .account-group {
+      margin-top: 0.025in;
+    }
+
+    .account-category {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid var(--border);
+      background: #f7f7f7;
+      font-size: 7px;
+      font-weight: 700;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      text-transform: uppercase;
+    }
+
+    .account-group .field-list {
+      padding: 0.02in 0.04in;
+      box-sizing: border-box;
+    }
+
+    .account-group .field-list .row {
+      min-height: 0.14in;
+    }
+
+    .account-group .field-list {
+      gap: 0.01in;
+      font-size: 8px;
+    }
+
+    .account-group .field-list .row .value {
+      min-height: 0.14in;
+    }
+
+    .observations {
+      width: 100%;
+      margin-top: 0.12in;
+      border: 1px solid var(--border);
+      padding: 0.05in 0.06in 0.03in;
+      font-size: 9px;
+    }
+
+    .observations .title {
+      font-weight: 700;
+      margin-bottom: 0.04in;
+    }
+
+    .observations .line {
+      display: flex;
+      align-items: center;
+      gap: 0.05in;
+      margin-top: 0.05in;
+      font-size: 9px;
+    }
+
+    .observations .line .label {
+      min-width: 0.42in;
+      font-weight: 700;
+    }
+
+    .observations .line .under {
+      flex: 1;
+      border-bottom: 1px solid var(--border);
+      height: 0.12in;
+    }
+
+    .title2 {
+      font-size: 13px;
+      font-weight: 700;
+      margin: 0.12in 0 0.06in;
+      line-height: 1.2;
+    }
+
+    .credit-table-wrap {
+      border: 1px solid var(--border);
+      margin-top: 0.06in;
+      padding: 0.04in 0.04in 0.02in;
+      background: #fff;
+    }
+
+    .credit-table {
+      font-size: 8.6px;
+    }
+
+    .credit-table th {
+      background: #f9f9f9;
+      font-size: 8.4px;
+    }
+
+    .credit-table td {
+      height: 0.2in;
+      text-align: left;
+      padding-left: 0.04in;
+      word-break: break-word;
+    }
+
+    .credit-table td.empty-cell {
+      background: #fff;
+      border-style: dashed;
+      border-color: #bcbcbc;
+    }
+
+    .credit-table td.client-cell {
+      font-size: 8.7px;
+      font-weight: 700;
+    }
+
+    .credit-total {
+      margin-top: 0.07in;
+      text-align: right;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .blank-section {
+      margin-top: 0.12in;
+      border: 1px solid var(--border);
+      padding: 0.05in;
+      background: #fff;
+    }
+
+    .blank-section .subhead {
+      font-size: 10px;
+      font-weight: 700;
+      margin-bottom: 0.04in;
+    }
+
+    .blank-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5px;
+    }
+
+    .blank-table th, .blank-table td {
+      border: 1px solid var(--border);
+      height: 0.18in;
+      background: #fff;
+    }
+
+    .blank-table th {
+      background: #f7f7f7;
+    }
+
+    .gastos-total {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 0.08in;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .legal {
+      margin-top: 0.16in;
+      font-size: 7px;
+      line-height: 1.25;
+      text-align: justify;
+      color: #111;
+      border-top: 1px solid var(--border);
+      padding-top: 0.04in;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .no-print {
+      display: none;
+    }
+
+    @media print {
+      @page {
+        size: Letter portrait;
+        margin: 0.15in;
+      }
+
+      html, body {
+        width: 100%;
+        height: 100%;
+        background: #fff;
+      }
+
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .page {
+        margin: 0;
+        width: 100%;
+        height: 10.45in;
+        min-height: 10.45in;
+        max-height: 10.45in;
+        overflow: hidden;
+      }
+
+      .page:last-child {
+        page-break-after: auto;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .app-topbar {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-topbar">
+    <a href="index.html" class="logo" aria-label="Volver al menú principal">Cor<span>tex</span></a>
+    <button type="button" class="print-button" onclick="window.print()">Imprimir</button>
+  </header>
+
+  <div class="page page-front">
+    <div class="topbar">
+      <div class="brand">
+        <div class="name">Cortex</div>
+        <div class="subtitle">Pre - Corte Promotores</div>
+        <div class="subtext">Estaciones de Servicio</div>
+      </div>
+      <div class="doc-meta">
+        <div>SF-RE-ES-02</div>
+        <div>Rev. 02</div>
+        <div>Ene-17</div>
+      </div>
+    </div>
+
+    <div class="header-row">
+      <div class="header-field"><span class="label">Estación:</span><span class="value" id="estacionHeader">-</span></div>
+      <div class="header-field"><span class="label">Isla:</span><span class="value" id="islaHeader">-</span></div>
+      <div class="header-field"><span class="label">Turno:</span><span class="value" id="turnoHeader">-</span></div>
+      <div class="header-field"><span class="label">Fecha:</span><span class="value" id="fechaHeader">-</span></div>
+    </div>
+
+    <div class="content">
+      <div class="readings-block">
+        <div class="section-label">Lecturas</div>
+        <div class="readings-grid">
+          <div class="reading-box">
+            <table id="tablaMagna">
+              <thead>
+                <tr><th>N° Disp.</th><th>Final</th><th>Inicial</th><th>Total Litros</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div class="total-line">Total Litros Magna: <span id="totalMagnaLitros">0.00</span></div>
+          </div>
+
+          <div class="reading-box">
+            <table id="tablaPremium">
+              <thead>
+                <tr><th>N° Disp.</th><th>Final</th><th>Inicial</th><th>Total Litros</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div class="total-line">Total Litros Premium: <span id="totalPremiumLitros">0.00</span></div>
+          </div>
+
+          <div class="reading-box diesel-full">
+            <table id="tablaDiesel">
+              <thead>
+                <tr><th>N° Disp.</th><th>Final</th><th>Inicial</th><th>Total Litros</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+            <div class="total-line">Total Litros Diesel: <span id="totalDieselLitros">0.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lower-row">
+        <div class="left-panel">
+          <div class="sale-box">
+            <table class="sale-table" id="ventaTable">
+              <tbody>
+                <tr><td>Magna</td><td class="num" id="ventaMagnaLitros">0.00</td><td class="num" id="ventaMagnaPesos">$0.00</td></tr>
+                <tr><td>Premium</td><td class="num" id="ventaPremiumLitros">0.00</td><td class="num" id="ventaPremiumPesos">$0.00</td></tr>
+                <tr><td>Diesel</td><td class="num" id="ventaDieselLitros">0.00</td><td class="num" id="ventaDieselPesos">$0.00</td></tr>
+                <tr><td>Total Combustible</td><td class="num total-sum" id="totalCombustibleLitros">0.00</td><td class="num total-sum" id="totalCombustiblePesos">$0.00</td></tr>
+                <tr><td>Aceites</td><td class="num">-</td><td class="num" id="ventaAceites">$0.00</td></tr>
+                <tr><td>Total Vendido</td><td class="num">-</td><td class="num total-sum" id="totalVendido">$0.00</td></tr>
+                <tr><td>Total Sistema</td><td class="num">-</td><td class="num total-sum" id="totalSistemaCell">$0.00</td></tr>
+              </tbody>
+            </table>
+
+            <div class="difference-row"><span class="label">Diferencia del total ventas vs total comprobado:</span><span id="diferenciaMonto">$0.00</span></div>
+          </div>
+
+          <div class="signature-row">
+            <div class="signature-box">
+              Nombre y firma del despachador que entra
+              <div class="line"></div>
+            </div>
+            <div class="signature-box">
+              Nombre y firma del despachador que sale
+              <div class="line"></div>
+            </div>
+          </div>
+        </div>
+
+          <div class="right-panel">
+          <div class="account-group">
+            <div class="account-category">Efectivo</div>
+            <div class="field-list">
+              <div class="row"><div class="label">Depósitos en Caja</div><div class="value" id="depositosCaja">$0.00</div></div>
+              <div class="row"><div class="label">Último Sobre</div><div class="value" id="ultimoSobre">$0.00</div></div>
+              <div class="row"><div class="label">Monedas</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Sobre de Aceites</div><div class="value" id="sobreAceites">$0.00</div></div>
+              <div class="row"><div class="label">Cheques</div><div class="value">-</div></div>
+            </div>
+          </div>
+          <div class="account-group">
+            <div class="account-category">Crédito</div>
+            <div class="field-list">
+              <div class="row"><div class="label">Flotillas</div><div class="value" id="flotillasValue">$0.00</div></div>
+              <div class="row"><div class="label">Servivales</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Pago por Evento</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Policía Intermunicipal</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Clientes Reembolso</div><div class="value">-</div></div>
+            </div>
+          </div>
+          <div class="account-group">
+            <div class="account-category">Sagarpa</div>
+            <div class="field-list">
+              <div class="row"><div class="label">Diesel Subsidio Pemex</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Diesel Estímulo Inbursa</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Magna Subsidio Pemex</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Magna Estímulo Inbursa</div><div class="value">-</div></div>
+            </div>
+          </div>
+          <div class="account-group">
+            <div class="account-category">Tarjeta</div>
+            <div class="field-list">
+              <div class="row"><div class="label">Tarjeta Bancomer</div><div class="value">-</div></div>
+              <div class="row"><div class="label">American Express</div><div class="value">-</div></div>
+            </div>
+          </div>
+          <div class="account-group">
+            <div class="account-category">Otros</div>
+            <div class="field-list">
+              <div class="row"><div class="label">Gastos de Estación</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Peajes</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Devoluciones a tanque</div><div class="value">-</div></div>
+              <div class="row"><div class="label">Netpay</div><div class="value" id="netpayValue">$0.00</div></div>
+              <div class="row total-line big-value"><div class="label">Total comprobado</div><div class="value" id="totalComprobadoMonto">$0.00</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="observations">
+        <div class="title">Observaciones (Espacio libre para aclaraciones o detalles en sus cortes)</div>
+        <div class="line"><span class="label">Entrada:</span><span class="under"></span></div>
+        <div class="line"><span class="label">Salida:</span><span class="under"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page page-back">
+    <div class="title2">A continuación detallo el monto de crédito de cada cliente al que le suministré combustible y/o aceite el día de hoy:</div>
+
+    <div class="credit-table-wrap">
+      <table class="credit-table" id="creditTable">
+        <thead>
+          <tr>
+            <th style="width:33.33%;">N°</th>
+            <th style="width:33.33%;">Nombre y N° de Cte</th>
+            <th style="width:33.33%;">Importe $</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="credit-total">Total de Crédito........................ <span id="totalCreditoMonto">$0.00</span></div>
+
+    <div class="blank-section" style="margin-top:0.18in;">
+      <div class="subhead">Clientes Reembolsos</div>
+      <table class="blank-table">
+        <thead>
+          <tr>
+            <th>Nombre del Cliente</th>
+            <th>N°</th>
+            <th>Dep. 1 $</th>
+            <th>N°</th>
+            <th>Dep. 2 $</th>
+            <th>N°</th>
+            <th>Dep. 3 $</th>
+            <th>Total Dep. $</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="blank-section" style="margin-top:0.12in;">
+      <div class="subhead">Relación de Cheques</div>
+      <table class="blank-table">
+        <thead>
+          <tr>
+            <th>N° cheque</th>
+            <th>Nombre o Razón Social del Cliente/Empresa</th>
+            <th>Banco</th>
+            <th>Importe $</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="blank-section" style="margin-top:0.12in;">
+      <div class="subhead">Relación de Gastos</div>
+      <table class="blank-table">
+        <thead>
+          <tr>
+            <th>N° de Notas</th>
+            <th>Proveedor</th>
+            <th>Concepto</th>
+            <th>Solicita</th>
+            <th>Autoriza</th>
+            <th>Importe $</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+      <div class="gastos-total">Total de Gastos........................ <span>$0.00</span></div>
+    </div>
+
+    <div class="legal">
+      Bajo protesta de decir verdad, manifiesto y hago constar que la información anexa y detallada en el presente documento es auténtica y veraz y que cumple con los requerimientos que la empresa me solicita, por lo que asumo la responsabilidad total en el caso de que hubiere alguna anomalía o alteración de dicha información y/o vales o notas anexas.
+    </div>
+  </div>
+
+  <script>
+    // =====================================================
+    // PUNTO DE INYECCIÓN DE DATOS
+    // Estos valores deben venir de lecturas.html y caja.html
+    // (localStorage o variables globales)
+    // =====================================================
+
+    const data = {
+      estacion: "La Tinaja",
+      isla: "",
+      turno: "",
+      fecha: new Date().toLocaleDateString("es-MX"),
+
+      magna: [],
+      premium: [],
+      diesel: [],
+
+      ventas: {
+        magna: { litros: 0, pesos: 0 },
+        premium: { litros: 0, pesos: 0 },
+        diesel: { litros: 0, pesos: 0 },
+        aceites: 0
+      },
+
+      totalSistema: 0,
+      flotillas: 0,
+      netpay: 0,
+
+      clientesCredito: []
+    };
+
+    function toNumber(value, fallback = 0) {
+      const n = Number(String(value ?? "").replace(/,/g, ""));
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function money(value) {
+      return "$" + Number(value || 0).toLocaleString("es-MX", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function liters(value) {
+      return Number(value || 0).toLocaleString("es-MX", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function readingInteger(value) {
+      return Number(value || 0).toLocaleString("es-MX", {
+        maximumFractionDigits: 0
+      });
+    }
+
+    function readLocalData() {
+      const fallback = {
+        activeTurn: { isla: "", turno: "", estacion: data.estacion },
+        turnData: {
+          readings: { magna: [], premium: [], diesel: [] },
+          totalSistema: 0,
+          aditivos: 0,
+          transactions: []
+        }
+      };
+
+      try {
+        const raw = localStorage.getItem("cortex");
+        if (!raw) return fallback;
+        return JSON.parse(raw);
+      } catch (error) {
+        console.warn("No se pudo leer localStorage['cortex']:", error);
+        return fallback;
+      }
+    }
+
+    function normalizeReadingArray(list) {
+      if (!Array.isArray(list)) return [];
+      return list.filter(Boolean);
+    }
+
+    function normalizeStoredReadings(readings) {
+      const rows = { magna: [], premium: [], diesel: [] };
+
+      if (!readings || typeof readings !== "object") return rows;
+
+      if (Array.isArray(readings.magna) || Array.isArray(readings.premium) || Array.isArray(readings.diesel)) {
+        rows.magna = normalizeReadingArray(readings.magna);
+        rows.premium = normalizeReadingArray(readings.premium);
+        rows.diesel = normalizeReadingArray(readings.diesel);
+        return rows;
+      }
+
+      Object.entries(readings).forEach(([disp, dispenserReadings]) => {
+        if (!dispenserReadings || typeof dispenserReadings !== "object") return;
+
+        ["magna", "premium", "diesel"].forEach(product => {
+          const dispenserNumber = Number(disp);
+          const validDispenser = product === "diesel"
+            ? dispenserNumber >= 5 && dispenserNumber <= 8
+            : dispenserNumber >= 1 && dispenserNumber <= 4;
+          if (!validDispenser) return;
+
+          const reading = dispenserReadings[product];
+          if (!reading || typeof reading !== "object") return;
+
+          const inicial = toNumber(reading.inicial, 0);
+          const final = toNumber(reading.final, 0);
+          rows[product].push({
+            disp,
+            inicial,
+            final,
+            litros: Math.max(0, final - inicial)
+          });
+        });
+      });
+
+      return rows;
+    }
+
+    function buildReadingRows(typeName, list) {
+      const maxRows = Math.max(4, list.length || 4);
+      const tbody = document.querySelector(`#tabla${typeName} tbody`);
+      tbody.innerHTML = "";
+
+      for (let i = 0; i < maxRows; i++) {
+        const row = list[i] || {};
+        const tr = document.createElement("tr");
+        const disp = row.disp ?? row.numero ?? row.numeroDisp ?? "";
+        const finalValue = row.final ?? row.ultimo ?? row.fin ?? "";
+        const inicialValue = row.inicial ?? row.inicio ?? row.ini ?? "";
+        const litrosValue = row.litros ?? row.totalLitros ?? (toNumber(finalValue) - toNumber(inicialValue));
+        const displayFinal = toNumber(finalValue) === 0 ? "" : readingInteger(finalValue);
+        const displayInicial = toNumber(inicialValue) === 0 ? "" : readingInteger(inicialValue);
+        const displayLitros = toNumber(litrosValue) === 0 ? "" : readingInteger(litrosValue);
+
+        tr.innerHTML = `
+          <td>${disp ?? ""}</td>
+          <td class="num">${displayFinal}</td>
+          <td class="num">${displayInicial}</td>
+          <td class="num">${displayLitros}</td>
+        `;
+
+        tbody.appendChild(tr);
+      }
+    }
+
+    function fillTotals() {
+      const totalMagna = normalizeReadingArray(data.magna).reduce((acc, item) => acc + toNumber(item.litros), 0);
+      const totalPremium = normalizeReadingArray(data.premium).reduce((acc, item) => acc + toNumber(item.litros), 0);
+      const totalDiesel = normalizeReadingArray(data.diesel).reduce((acc, item) => acc + toNumber(item.litros), 0);
+
+      document.getElementById("totalMagnaLitros").textContent = readingInteger(totalMagna);
+      document.getElementById("totalPremiumLitros").textContent = readingInteger(totalPremium);
+      document.getElementById("totalDieselLitros").textContent = readingInteger(totalDiesel);
+
+      const ventaMagnaLitros = toNumber(data.ventas?.magna?.litros, 0);
+      const ventaPremiumLitros = toNumber(data.ventas?.premium?.litros, 0);
+      const ventaDieselLitros = toNumber(data.ventas?.diesel?.litros, 0);
+      const ventaMagnaPesos = toNumber(data.ventas?.magna?.pesos, 0);
+      const ventaPremiumPesos = toNumber(data.ventas?.premium?.pesos, 0);
+      const ventaDieselPesos = toNumber(data.ventas?.diesel?.pesos, 0);
+      const aceites = toNumber(data.ventas?.aceites, 0);
+      const totalCombustibleLitros = ventaMagnaLitros + ventaPremiumLitros + ventaDieselLitros;
+      const totalCombustiblePesos = ventaMagnaPesos + ventaPremiumPesos + ventaDieselPesos;
+      const totalVendido = totalCombustiblePesos + (aceites > 0 ? aceites : 0);
+      const totalSistema = toNumber(data.totalSistema, 0);
+      const diferencia = totalSistema - totalVendido;
+
+      document.getElementById("ventaMagnaLitros").textContent = liters(ventaMagnaLitros);
+      document.getElementById("ventaPremiumLitros").textContent = liters(ventaPremiumLitros);
+      document.getElementById("ventaDieselLitros").textContent = liters(ventaDieselLitros);
+      document.getElementById("ventaMagnaPesos").textContent = money(ventaMagnaPesos);
+      document.getElementById("ventaPremiumPesos").textContent = money(ventaPremiumPesos);
+      document.getElementById("ventaDieselPesos").textContent = money(ventaDieselPesos);
+      document.getElementById("totalCombustibleLitros").textContent = liters(totalCombustibleLitros);
+      document.getElementById("totalCombustiblePesos").textContent = money(totalCombustiblePesos);
+      document.getElementById("ventaAceites").textContent = money(aceites);
+      document.getElementById("totalVendido").textContent = money(totalVendido);
+      document.getElementById("totalSistemaCell").textContent = money(totalSistema);
+      document.getElementById("diferenciaMonto").textContent = money(diferencia);
+
+      const miles = Math.floor((totalSistema - data.flotillas - data.netpay) / 1000);
+      const residuo = (totalSistema - data.flotillas - data.netpay) % 1000;
+      const depositosCaja = miles * 1000;
+      const ultimoSobre = Math.abs(residuo);
+      const netpayValue = toNumber(data.netpay, 0);
+      const flotillasValue = toNumber(data.flotillas, 0);
+      const sobreAceites = aceites > 0 ? aceites : 0;
+
+      document.getElementById("depositosCaja").textContent = money(depositosCaja);
+      document.getElementById("ultimoSobre").textContent = money(ultimoSobre);
+      document.getElementById("sobreAceites").textContent = money(sobreAceites);
+      document.getElementById("flotillasValue").textContent = money(flotillasValue);
+      document.getElementById("netpayValue").textContent = money(netpayValue);
+
+      const comprobadoRows = [
+        depositosCaja,
+        ultimoSobre,
+        flotillasValue,
+        netpayValue,
+        sobreAceites
+      ].filter(value => Number(value) > 0);
+
+      const comprobadoTotal = comprobadoRows.reduce((acc, value) => acc + Number(value), 0);
+      const validTarget = totalSistema + aceites;
+      const isValid = Math.abs(comprobadoTotal - validTarget) < 0.01;
+      const totalComprobadoEl = document.getElementById("totalComprobadoMonto");
+      totalComprobadoEl.textContent = money(comprobadoTotal);
+      totalComprobadoEl.classList.toggle("green", isValid);
+      totalComprobadoEl.classList.toggle("red", !isValid);
+    }
+
+    function resolveClientName(numeroCliente) {
+      const local = readLocalData();
+      const allClients = local?.config?.clientes || [];
+      const match = allClients.find(client => String(client.numeroCliente) === String(numeroCliente));
+      return match?.apodo || match?.nombre || `Cliente ${numeroCliente}`;
+    }
+
+    function buildCreditTable() {
+      const creditEntries = Array.isArray(data.clientesCredito) ? data.clientesCredito : [];
+
+      const tbody = document.querySelector("#creditTable tbody");
+      tbody.innerHTML = "";
+
+      const rows = creditEntries.map(entry => [
+        String(entry.transacciones || 0),
+        `${entry.numeroCliente} - ${entry.apodo || resolveClientName(entry.numeroCliente)}`,
+        money(entry.importe || 0)
+      ]);
+
+      while (rows.length < 4) rows.push(["", "", ""]);
+
+      rows.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach((value, index) => {
+          const td = document.createElement("td");
+          if (!value) {
+            td.className = "empty-cell";
+            td.innerHTML = "&nbsp;";
+          } else {
+            td.textContent = value;
+            if (index === 1) td.className = "client-cell";
+          }
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      const totalCredito = creditEntries.reduce((acc, item) => acc + Number(item.importe || 0), 0);
+      document.getElementById("totalCreditoMonto").textContent = money(totalCredito);
+    }
+
+    function applyStaticHeaderData() {
+      const local = readLocalData();
+      const activeTurn = local?.activeTurn || {};
+      const estacion = data.estacion || "La Tinaja";
+      const isla = activeTurn.isla ?? data.isla ?? "";
+      const turno = activeTurn.turno ?? data.turno ?? "";
+      const fecha = data.fecha || new Date().toLocaleDateString("es-MX");
+
+      document.getElementById("estacionHeader").textContent = estacion;
+      document.getElementById("islaHeader").textContent = isla;
+      document.getElementById("turnoHeader").textContent = turno;
+      document.getElementById("fechaHeader").textContent = fecha;
+    }
+
+    function hydrateFromStorage() {
+      const local = readLocalData();
+      const turnData = local?.turnData || {};
+      const readings = turnData.readings || {};
+      const normalizedReadings = normalizeStoredReadings(readings);
+
+      data.estacion = local?.activeTurn?.estacion || data.estacion;
+      data.isla = local?.activeTurn?.isla ?? data.isla;
+      data.turno = local?.activeTurn?.turno ?? data.turno;
+      data.fecha = data.fecha || new Date().toLocaleDateString("es-MX");
+
+      data.magna = normalizedReadings.magna.length ? normalizedReadings.magna : normalizeReadingArray(data.magna);
+      data.premium = normalizedReadings.premium.length ? normalizedReadings.premium : normalizeReadingArray(data.premium);
+      data.diesel = normalizedReadings.diesel.length ? normalizedReadings.diesel : normalizeReadingArray(data.diesel);
+
+      const transactions = Array.isArray(turnData.transactions) ? turnData.transactions : [];
+      const netpayTotal = transactions
+        .filter(transaction => transaction && transaction.tipo === "netpay")
+        .reduce((total, transaction) => total + toNumber(transaction.monto, 0), 0);
+      const flotillaTotal = transactions
+        .filter(transaction => transaction && transaction.tipo === "flotilla")
+        .reduce((total, transaction) => total + toNumber(transaction.monto, 0), 0);
+
+      data.ventas = {
+        magna: {
+          litros: toNumber(turnData.ventas?.magna?.litros || data.ventas?.magna?.litros, 0),
+          pesos: toNumber(turnData.ventas?.magna?.pesos || data.ventas?.magna?.pesos, 0)
+        },
+        premium: {
+          litros: toNumber(turnData.ventas?.premium?.litros || data.ventas?.premium?.litros, 0),
+          pesos: toNumber(turnData.ventas?.premium?.pesos || data.ventas?.premium?.pesos, 0)
+        },
+        diesel: {
+          litros: toNumber(turnData.ventas?.diesel?.litros || data.ventas?.diesel?.litros, 0),
+          pesos: toNumber(turnData.ventas?.diesel?.pesos || data.ventas?.diesel?.pesos, 0)
+        },
+        aceites: toNumber(turnData.aditivos ?? turnData.ventas?.aceites ?? data.ventas?.aceites, 0)
+      };
+
+      data.totalSistema = toNumber(turnData.totalSistema || data.totalSistema, 0);
+      data.flotillas = flotillaTotal || toNumber(turnData.flotillas || data.flotillas, 0);
+      data.netpay = netpayTotal || toNumber(turnData.netpay || data.netpay, 0);
+
+      const flotillas = transactions.filter(t => t && t.tipo === "flotilla");
+      const groupedCredit = new Map();
+      flotillas.forEach(transaction => {
+        const numeroCliente = transaction.numeroCliente;
+        const key = String(numeroCliente ?? "");
+        const current = groupedCredit.get(key) || {
+          numeroCliente,
+          apodo: resolveClientName(numeroCliente),
+          transacciones: 0,
+          importe: 0
+        };
+        current.transacciones += 1;
+        current.importe += toNumber(transaction.monto, 0);
+        groupedCredit.set(key, current);
+      });
+      data.clientesCredito = Array.from(groupedCredit.values());
+    }
+
+    function render() {
+      hydrateFromStorage();
+      applyStaticHeaderData();
+
+      buildReadingRows("Magna", data.magna);
+      buildReadingRows("Premium", data.premium);
+      buildReadingRows("Diesel", data.diesel);
+
+      fillTotals();
+      buildCreditTable();
+    }
+
+    document.addEventListener("DOMContentLoaded", render);
+  </script>
+</body>
+</html>
