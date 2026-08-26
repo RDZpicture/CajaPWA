@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<meta name="theme-color" content="#ffffff">
+	<title>Cortex - Generator</title>
+	<style>
+		* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+		:root {
+			--blue: #2196f3;
+			--blue-dark: #1976d2;
+			--blue-light: #e3f2fd;
+			--green: #16833a;
+			--red: #d52632;
+			--bg: #f1f4f5;
+			--card: #fff;
+			--input: #e7eaee;
+			--text: #111;
+			--muted: #7c8798;
+			--shadow: 0 4px 12px rgba(0, 0, 0, .1);
+		}
+		html, body { margin: 0; min-height: 100%; font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); }
+		body { min-height: 100vh; padding-bottom: 24px; }
+		button, input, select { font: inherit; }
+		button { border: 0; cursor: pointer; }
+		.topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; background: rgba(255,255,255,.97); border-bottom: 1px solid rgba(0,0,0,.05); }
+		.logo { color: var(--text); text-decoration: none; font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+		.logo span { color: var(--blue); }
+		.back { color: var(--blue-dark); text-decoration: none; font-size: 14px; font-weight: 700; }
+		main { width: 100%; max-width: 760px; margin: 0 auto; padding: 22px 16px 30px; }
+		.intro { margin-bottom: 18px; }
+		.intro h1 { margin: 0 0 5px; font-size: 27px; }
+		.intro p { margin: 0; color: var(--muted); font-size: 14px; }
+		.status-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding: 14px 16px; background: var(--blue-light); color: var(--blue-dark); border-radius: 15px; font-weight: 700; }
+		.count { font-size: 23px; white-space: nowrap; }
+		.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 14px; }
+		.tab { min-height: 45px; border-radius: 12px; background: var(--card); color: var(--muted); font-weight: 700; box-shadow: var(--shadow); }
+		.tab.active { background: var(--blue); color: #fff; }
+		.panel { display: none; padding: 18px; background: var(--card); border-radius: 18px; box-shadow: var(--shadow); }
+		.panel.active { display: block; }
+		.panel h2 { margin: 0 0 5px; font-size: 21px; }
+		.panel-subtitle { margin: 0 0 17px; color: var(--muted); font-size: 13px; }
+		.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+		.field label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 700; }
+		.field input, .field select { width: 100%; height: 48px; border: 0; outline: 0; border-radius: 12px; padding: 0 12px; background: var(--input); color: var(--text); }
+		.field input:focus, .field select:focus { box-shadow: 0 0 0 2px rgba(33,150,243,.3); }
+		.field small { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; }
+		.form-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 17px; }
+		.primary, .secondary, .danger { min-height: 48px; padding: 0 16px; border-radius: 12px; font-weight: 700; }
+		.primary { background: var(--blue); color: #fff; }
+		.secondary { background: var(--input); color: var(--text); }
+		.danger { background: var(--red); color: #fff; }
+		.message { min-height: 20px; margin-top: 14px; color: var(--muted); font-size: 14px; font-weight: 700; }
+		.message.success { color: var(--green); }
+		.message.error { color: var(--red); }
+		.result { margin-top: 18px; padding: 16px; border-radius: 14px; background: #f7f9fa; border: 1px solid #e1e5e8; }
+		.result h3 { margin: 0 0 10px; font-size: 17px; }
+		.result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+		.result-item { padding: 10px 8px; border-radius: 10px; background: var(--input); }
+		.result-item strong { display: block; margin-top: 3px; font-size: 16px; }
+		.result-label { color: var(--muted); font-size: 11px; font-weight: 700; }
+		.prediction { margin-top: 12px; padding: 14px; border-radius: 13px; background: var(--blue-light); color: var(--blue-dark); }
+		.prediction-title { font-size: 13px; font-weight: 700; }
+		.prediction-value { margin-top: 3px; font-size: 25px; font-weight: 800; }
+		.note { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+		.pin-screen { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 18px; background: var(--bg); }
+		.pin-card { width: 100%; max-width: 390px; padding: 24px 20px; text-align: center; background: var(--card); border-radius: 20px; box-shadow: var(--shadow); }
+		.pin-card h1 { margin: 0 0 7px; font-size: 27px; }
+		.pin-card p { margin: 0 0 18px; color: var(--muted); font-size: 14px; }
+		.pin-card input { width: 100%; height: 54px; border: 0; outline: 0; border-radius: 13px; background: var(--input); text-align: center; font-size: 24px; letter-spacing: 5px; }
+		.pin-card button { width: 100%; height: 50px; margin-top: 12px; border-radius: 13px; background: var(--blue); color: #fff; font-weight: 700; }
+		.pin-error { min-height: 20px; margin: 11px 0 0; color: var(--red); font-size: 13px; font-weight: 700; }
+		.hidden { display: none !important; }
+		@media (max-width: 500px) {
+			.form-grid, .result-grid { grid-template-columns: 1fr; }
+			.status-bar { align-items: flex-start; flex-direction: column; }
+			.count { font-size: 21px; }
+		}
+	</style>
+</head>
+<body>
+	<div id="pinScreen" class="pin-screen">
+		<form id="pinForm" class="pin-card">
+			<h1>Access protegido</h1>
+			<p>Ingresa el PIN para abrir Generator.</p>
+			<input id="pinInput" type="password" inputmode="numeric" autocomplete="off" maxlength="4" aria-label="PIN" autofocus>
+			<button type="submit">Entrar</button>
+			<div id="pinError" class="pin-error" role="alert"></div>
+		</form>
+	</div>
+
+	<div id="app" class="hidden">
+		<header class="topbar">
+			<a href="index.html" class="logo" aria-label="Volver al menú principal">Cor<span>tex</span></a>
+			<a href="index.html" class="back">Volver al menú</a>
+		</header>
+		<main>
+			<section class="intro">
+				<h1>Generator</h1>
+				<p>Registra datos y consulta predicciones locales por producto y dispensario.</p>
+			</section>
+			<div class="status-bar"><span>Registros guardados</span><span id="recordCount" class="count">0/200</span></div>
+			<nav class="tabs" aria-label="Secciones de Generator">
+				<button type="button" class="tab active" data-tab="registerPanel">Registrar</button>
+				<button type="button" class="tab" data-tab="searchPanel">Buscar / Predecir</button>
+				<button type="button" class="tab" data-tab="dataPanel">Exportar</button>
+			</nav>
+
+			<section id="registerPanel" class="panel active">
+				<h2>Registrar datos</h2>
+				<p class="panel-subtitle">Añade un ejemplo de entrenamiento sin repetir registros idénticos.</p>
+				<form id="registerForm">
+					<div class="form-grid">
+						<div class="field"><label for="rProduct">Producto</label><select id="rProduct" required><option value="M">Magna</option><option value="P">Premium</option><option value="D">Diesel</option></select></div>
+						<div class="field"><label for="rDispenser">Dispensario</label><select id="rDispenser" required></select><small>1-4: Magna/Premium; 5-8: Diesel</small></div>
+						<div class="field"><label for="rLiters">L (Litros)</label><input id="rLiters" type="number" min="0.001" step="0.001" required></div>
+						<div class="field"><label for="rPesos">P (Pesos)</label><input id="rPesos" type="number" min="0.01" step="0.01" required></div>
+						<div class="field"><label for="rPrice">Precio / factor</label><input id="rPrice" type="number" min="0.01" step="0.01" required></div>
+						<div class="field"><label for="rDigit">D (Dígito)</label><input id="rDigit" type="number" min="1" max="99" step="1" required></div>
+					</div>
+					<div class="form-actions"><button class="primary" type="submit">Guardar registro</button><button class="secondary" type="reset">Limpiar</button></div>
+					<div id="registerMessage" class="message" role="status"></div>
+				</form>
+			</section>
+
+			<section id="searchPanel" class="panel">
+				<h2>Buscar / Predecir</h2>
+				<p class="panel-subtitle">Busca una combinación exacta o calcula una predicción con kNN.</p>
+				<form id="searchForm">
+					<div class="form-grid">
+						<div class="field"><label for="sProduct">Producto</label><select id="sProduct" required><option value="M">Magna</option><option value="P">Premium</option><option value="D">Diesel</option></select></div>
+						<div class="field"><label for="sDispenser">Dispensario</label><select id="sDispenser" required></select></div>
+						<div class="field"><label for="sLiters">L (Litros)</label><input id="sLiters" type="number" min="0.001" step="0.001" required></div>
+						<div class="field"><label for="sPesos">P (Pesos)</label><input id="sPesos" type="number" min="0.01" step="0.01" required></div>
+						<div class="field"><label for="sPrice">Precio / factor</label><input id="sPrice" type="number" min="0.01" step="0.01" required></div>
+					</div>
+					<div class="form-actions"><button class="primary" type="submit">Buscar y predecir</button></div>
+				</form>
+				<div id="searchMessage" class="message" role="status"></div>
+				<div id="exactResult" class="result hidden"></div>
+				<div id="predictionResult" class="prediction"><div class="prediction-title">Predicción</div><div class="prediction-value">Llenando registros 0/200</div></div>
+			</section>
+
+			<section id="dataPanel" class="panel">
+				<h2>Exportar registros</h2>
+				<p class="panel-subtitle">Descarga todos los datos locales en formato CSV compatible con hojas de cálculo.</p>
+				<div class="form-actions"><button id="exportButton" class="primary" type="button">Exportar registros</button><button id="clearButton" class="danger" type="button">Borrar todos</button></div>
+				<div id="dataMessage" class="message" role="status"></div>
+				<p class="note">El borrado solicita confirmación y no puede deshacerse.</p>
+			</section>
+		</main>
+	</div>
+
+	<script>
+		"use strict";
+
+		const DB_NAME = "cortex-generator-db";
+		const DB_VERSION = 1;
+		const STORE_NAME = "registros";
+		const MINIMUM_RECORDS = 200;
+		const PIN_PARTS = [49, 57, 56, 55];
+		let database;
+		let records = [];
+
+		const $ = id => document.getElementById(id);
+		const productNames = { M: "Magna", P: "Premium", D: "Diesel" };
+
+		function getPin() {
+			return PIN_PARTS.map(value => String.fromCharCode(value)).join("");
+		}
+
+		function showMessage(element, text, type) {
+			element.textContent = text;
+			element.className = "message" + (type ? " " + type : "");
+		}
+
+		function openDatabase() {
+			return new Promise((resolve, reject) => {
+				const request = indexedDB.open(DB_NAME, DB_VERSION);
+				request.onupgradeneeded = () => {
+					if (!request.result.objectStoreNames.contains(STORE_NAME)) {
+						request.result.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+					}
+				};
+				request.onsuccess = () => resolve(request.result);
+				request.onerror = () => reject(request.error);
+			});
+		}
+
+		function getAllRecords() {
+			return new Promise((resolve, reject) => {
+				const request = database.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).getAll();
+				request.onsuccess = () => resolve(request.result);
+				request.onerror = () => reject(request.error);
+			});
+		}
+
+		function addRecord(record) {
+			return new Promise((resolve, reject) => {
+				const request = database.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME).add(record);
+				request.onsuccess = () => resolve();
+				request.onerror = () => reject(request.error);
+			});
+		}
+
+		function clearRecords() {
+			return new Promise((resolve, reject) => {
+				const request = database.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME).clear();
+				request.onsuccess = () => resolve();
+				request.onerror = () => reject(request.error);
+			});
+		}
+
+		function populateDispenserSelects() {
+			[$("rDispenser"), $("sDispenser")].forEach(select => {
+				select.innerHTML = "";
+				for (let number = 1; number <= 8; number += 1) {
+					const option = document.createElement("option");
+					option.value = number;
+					option.textContent = "Dispensario " + number;
+					select.appendChild(option);
+				}
+			});
+		}
+
+		function validateValues(values, includeDigit) {
+			const productValid = Object.prototype.hasOwnProperty.call(productNames, values.product);
+			const dispenserValid = Number.isInteger(values.dispenser) && values.dispenser >= 1 && values.dispenser <= 8;
+			const productDispenserValid = values.product === "D" ? values.dispenser >= 5 : values.dispenser <= 4;
+			const numbersValid = Number.isFinite(values.liters) && values.liters > 0 && Number.isFinite(values.pesos) && values.pesos > 0 && Number.isFinite(values.price) && values.price > 0;
+			const precisionValid = Number(values.liters.toFixed(3)) === values.liters && Number(values.pesos.toFixed(2)) === values.pesos && Number(values.price.toFixed(2)) === values.price;
+			const digitValid = !includeDigit || (Number.isInteger(values.digit) && values.digit >= 1 && values.digit <= 99);
+			if (!productValid || !dispenserValid || !productDispenserValid || !numbersValid || !precisionValid || !digitValid) {
+				throw new Error("Revisa los valores y la relación entre producto y dispensario.");
+			}
+		}
+
+		function readValues(prefix, includeDigit) {
+			const values = {
+				product: $(prefix + "Product").value,
+				dispenser: Number($(prefix + "Dispenser").value),
+				liters: Number($(prefix + "Liters").value),
+				pesos: Number($(prefix + "Pesos").value),
+				price: Number($(prefix + "Price").value)
+			};
+			if (includeDigit) values.digit = Number($(prefix + "Digit").value);
+			validateValues(values, includeDigit);
+			return {
+				product: values.product,
+				dispenser: values.dispenser,
+				liters: Number(values.liters.toFixed(3)),
+				pesos: Number(values.pesos.toFixed(2)),
+				price: Number(values.price.toFixed(2)),
+				...(includeDigit ? { digit: values.digit } : {})
+			};
+		}
+
+		function sameInput(left, right, includeDigit) {
+			return left.product === right.product && left.dispenser === right.dispenser && left.liters === right.liters && left.pesos === right.pesos && left.price === right.price && (!includeDigit || left.digit === right.digit);
+		}
+
+		function updateCount() {
+			$("recordCount").textContent = records.length + "/" + MINIMUM_RECORDS;
+		}
+
+		function formatValue(value, decimals) {
+			return Number(value).toFixed(decimals);
+		}
+
+		function renderExact(record) {
+			if (!record) {
+				$("exactResult").classList.add("hidden");
+				return;
+			}
+			$("exactResult").classList.remove("hidden");
+			$("exactResult").innerHTML = "<h3>Registro encontrado</h3><div class=\"result-grid\">" +
+				resultItem("Producto", productNames[record.product]) + resultItem("Dispensario", record.dispenser) +
+				resultItem("L (Litros)", formatValue(record.liters, 3)) + resultItem("P (Pesos)", "$" + formatValue(record.pesos, 2)) +
+				resultItem("Precio", "$" + formatValue(record.price, 2)) + resultItem("D (Dígito)", record.digit) + "</div>";
+		}
+
+		function resultItem(label, value) {
+			return "<div class=\"result-item\"><span class=\"result-label\">" + label + "</span><strong>" + value + "</strong></div>";
+		}
+
+		function predict(values) {
+			if (records.length < MINIMUM_RECORDS) return null;
+			const relevant = records.filter(record => record.product === values.product && record.dispenser === values.dispenser);
+			const source = relevant.length ? relevant : records.filter(record => record.product === values.product);
+			const distances = source.map(record => {
+				const distance = Math.sqrt(Math.pow((record.liters - values.liters) / Math.max(values.liters, 1), 2) + Math.pow((record.pesos - values.pesos) / Math.max(values.pesos, 1), 2) + Math.pow((record.price - values.price) / Math.max(values.price, 1), 2));
+				return { record, distance };
+			}).sort((left, right) => left.distance - right.distance).slice(0, Math.min(7, source.length));
+			const weighted = distances.reduce((sum, item) => sum + item.record.digit / (item.distance + 0.0001), 0);
+			const weight = distances.reduce((sum, item) => sum + 1 / (item.distance + 0.0001), 0);
+			return Math.max(1, Math.min(99, Math.round(weighted / weight)));
+		}
+
+		async function refreshRecords() {
+			records = await getAllRecords();
+			updateCount();
+		}
+
+		$("pinForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			if ($("pinInput").value !== getPin()) {
+				$("pinError").textContent = "PIN incorrecto. Regresando al menú...";
+				setTimeout(() => { window.location.replace("index.html"); }, 900);
+				return;
+			}
+			try {
+				database = await openDatabase();
+				await refreshRecords();
+				$("pinScreen").classList.add("hidden");
+				$("app").classList.remove("hidden");
+				$("rProduct").dispatchEvent(new Event("change"));
+			} catch (error) {
+				$("pinError").textContent = "No se pudo abrir el almacenamiento local.";
+			}
+		});
+
+		$("registerForm").addEventListener("submit", async event => {
+			event.preventDefault();
+			try {
+				const values = readValues("r", true);
+				if (records.some(record => sameInput(record, values, true))) {
+					showMessage($("registerMessage"), "Registro omitido: ya existe uno idéntico.", "error");
+					return;
+				}
+				await addRecord({ ...values, createdAt: new Date().toISOString() });
+				await refreshRecords();
+				showMessage($("registerMessage"), "Registro guardado correctamente.", "success");
+				event.target.reset();
+			} catch (error) {
+				showMessage($("registerMessage"), error.message, "error");
+			}
+		});
+
+		$("searchForm").addEventListener("submit", event => {
+			event.preventDefault();
+			try {
+				const values = readValues("s", false);
+				const exact = records.find(record => sameInput(record, values, false));
+				renderExact(exact);
+				showMessage($("searchMessage"), exact ? "Se encontró una coincidencia exacta." : "No encontrado.", exact ? "success" : "error");
+				const prediction = predict(values);
+				$("predictionResult").querySelector(".prediction-value").textContent = prediction === null ? "Llenando registros " + records.length + "/" + MINIMUM_RECORDS : "D = " + prediction;
+			} catch (error) {
+				showMessage($("searchMessage"), error.message, "error");
+			}
+		});
+
+		document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => {
+			document.querySelectorAll(".tab, .panel").forEach(element => element.classList.remove("active"));
+			tab.classList.add("active");
+			$(tab.dataset.tab).classList.add("active");
+		}));
+
+		$("exportButton").addEventListener("click", () => {
+			const headers = ["Producto", "Dispensario", "Litraje", "Pesos", "Precio", "Digito", "Creado"];
+			const rows = records.map(record => [productNames[record.product], record.dispenser, record.liters, record.pesos, record.price, record.digit, record.createdAt]);
+			const csv = [headers, ...rows].map(row => row.map(value => '"' + String(value ?? "").replace(/"/g, '""') + '"').join(",")).join("\r\n");
+			const link = document.createElement("a");
+			link.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }));
+			link.download = "cortex-registros.csv";
+			link.click();
+			URL.revokeObjectURL(link.href);
+			showMessage($("dataMessage"), records.length + " registros exportados.", "success");
+		});
+
+		$("clearButton").addEventListener("click", async () => {
+			if (!records.length) {
+				showMessage($("dataMessage"), "No hay registros para borrar.", "error");
+				return;
+			}
+			if (!window.confirm("¿Borrar todos los registros? Esta acción no se puede deshacer.")) return;
+			await clearRecords();
+			await refreshRecords();
+			showMessage($("dataMessage"), "Todos los registros fueron borrados.", "success");
+		});
+
+		populateDispenserSelects();
+	</script>
+</body>
+</html>
