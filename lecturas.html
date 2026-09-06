@@ -561,7 +561,7 @@ function inicializarLecturas() {
       lecturas[id] = {};
     }
 
-    ["magna", "premium", "diesel"].forEach(producto => {
+    obtenerProductosPorDispensario(d).forEach(producto => {
       if (!lecturas[id][producto]) {
         lecturas[id][producto] = {
           inicial: 0,
@@ -569,10 +569,22 @@ function inicializarLecturas() {
         };
       }
     });
+
+    Object.keys(lecturas[id]).forEach(producto => {
+      if (!obtenerProductosPorDispensario(d).includes(producto)) {
+        delete lecturas[id][producto];
+      }
+    });
   });
 
   estado.turnData.readings = lecturas;
   guardarEstado();
+}
+
+function obtenerProductosPorDispensario(dispensario) {
+  return Number(dispensario) >= 1 && Number(dispensario) <= 4
+    ? ["magna", "premium"]
+    : ["diesel"];
 }
 
 function obtenerPrecios() {
@@ -698,7 +710,7 @@ function productoHTML(id, producto, nombre, precio) {
 
       <div class="reading-result">
         <div class="result">
-          <small>Litros</small>
+          <small>Total de litros</small>
           <strong id="litros-${id}-${producto}">0.00 L</strong>
         </div>
       </div>
@@ -1040,7 +1052,11 @@ window.addEventListener("storage", () => {
 
   if (!hayTurnoActivo()) {
     window.location.replace("index.html");
+    return;
   }
+
+  obtenerPrecios();
+  renderSummary();
 });
 
 window.addEventListener("beforeunload", () => {
