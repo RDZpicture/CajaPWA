@@ -883,6 +883,28 @@
             </button>
 
 
+            <!-- HISTORIAL DE CORTES -->
+
+            <button
+                type="button"
+                class="menu-button"
+                onclick="irA('historial.html')"
+            >
+                <div class="menu-icon">
+                    🗂️
+                </div>
+
+                <div class="menu-label">
+                    Historial de cortes
+                </div>
+
+                <div class="menu-description">
+                    Últimos 30 días
+                </div>
+
+            </button>
+
+
             <!-- ACCESS -->
 
             <button
@@ -900,6 +922,48 @@
 
                 <div class="menu-description">
                     Generador
+                </div>
+            </button>
+
+
+            <!-- ADITIVOS -->
+
+            <button
+                type="button"
+                class="menu-button"
+                onclick="irA('aditivos.html')"
+            >
+                <div class="menu-icon">
+                    🧪
+                </div>
+
+                <div class="menu-label">
+                    Aditivos
+                </div>
+
+                <div class="menu-description">
+                    Control de aditivos
+                </div>
+            </button>
+
+
+            <!-- AYUDA -->
+
+            <button
+                type="button"
+                class="menu-button"
+                onclick="irA('soporte.html')"
+            >
+                <div class="menu-icon">
+                    ❔
+                </div>
+
+                <div class="menu-label">
+                    Ayuda
+                </div>
+
+                <div class="menu-description">
+                    Soporte
                 </div>
             </button>
 
@@ -1282,6 +1346,8 @@
 
                 turnData: null,
 
+                history: [],
+
                 /*
                  * Aquí podremos conservar posteriormente
                  * una copia de las lecturas finales del turno
@@ -1309,6 +1375,10 @@
                 ...base,
 
                 ...estado,
+
+                history: Array.isArray(estado.history)
+                    ? estado.history
+                    : [],
 
                 config: {
                     ...base.config,
@@ -1915,6 +1985,9 @@
             }
 
 
+            guardarCorteEnHistorial(estado);
+
+
             /*
              * Antes de eliminar los datos del turno,
              * guardamos únicamente las lecturas finales.
@@ -1974,6 +2047,53 @@
             mostrarToast(
                 "Turno cerrado correctamente."
             );
+        }
+
+
+        function guardarCorteEnHistorial(estadoActual) {
+
+            const turnId = estadoActual.activeTurn.id;
+            const salesData = JSON.parse(
+                localStorage.getItem("cortex.aditivos.sales") || "null"
+            ) || {};
+            const sales = [
+                ...(salesData.current?.sales || []),
+                ...(salesData.previous?.sales || [])
+            ].filter(venta =>
+                venta.turnId === turnId ||
+                (venta.turnId === undefined &&
+                    venta.turn === estadoActual.activeTurn.turno &&
+                    new Date(venta.createdAt).getTime() >=
+                        new Date(estadoActual.activeTurn.iniciadoEn).getTime())
+            );
+            const transactions = estadoActual.turnData?.transactions || [];
+            const copia = JSON.parse(JSON.stringify({
+                id: turnId,
+                closedAt: new Date().toISOString(),
+                activeTurn: estadoActual.activeTurn,
+                turnData: estadoActual.turnData,
+                sales,
+                totals: {
+                    transactionsCount: transactions.length,
+                    transactionsTotal: transactions.reduce(
+                        (total, transaccion) => total + Number(transaccion.monto || 0),
+                        0
+                    ),
+                    salesCount: sales.length,
+                    salesTotal: sales.reduce(
+                        (total, venta) => total + Number(venta.amount || 0),
+                        0
+                    )
+                }
+            }));
+
+            const history = Array.isArray(estadoActual.history)
+                ? estadoActual.history
+                : [];
+            const limite = Date.now() - (30 * 24 * 60 * 60 * 1000);
+            estadoActual.history = [copia, ...history]
+                .filter(corte => new Date(corte.closedAt).getTime() >= limite)
+                .slice(0, 100);
         }
 
 
