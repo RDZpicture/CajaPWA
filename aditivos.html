@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<meta name="theme-color" content="#ffffff">
+	<title>Cortex - Aditivos</title>
+
+	<style>
+		* {
+			box-sizing: border-box;
+			-webkit-tap-highlight-color: transparent;
+		}
+
+		:root {
+			--blue: #2196f3;
+			--blue-dark: #1976d2;
+			--blue-light: #e3f2fd;
+			--bg: #f1f4f5;
+			--card: #ffffff;
+			--text: #111111;
+			--muted: #7c8798;
+			--shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+			--radius: 20px;
+		}
+
+		html,
+		body {
+			margin: 0;
+			min-height: 100%;
+			width: 100%;
+			font-family: Arial, Helvetica, sans-serif;
+			background: var(--bg);
+			color: var(--text);
+		}
+
+		body {
+			min-height: 100vh;
+			padding-bottom: 30px;
+		}
+
+		button {
+			border: none;
+			cursor: pointer;
+			font: inherit;
+		}
+
+		.topbar {
+			position: sticky;
+			top: 0;
+			z-index: 20;
+			height: 70px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 0 18px;
+			background: rgba(255, 255, 255, 0.96);
+			border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+		}
+
+		.back-button {
+			width: 42px;
+			height: 42px;
+			border-radius: 14px;
+			background: var(--blue-light);
+			color: var(--blue-dark);
+			font-size: 25px;
+			line-height: 1;
+		}
+
+		.logo {
+			font-size: 28px;
+			font-weight: 800;
+			letter-spacing: -1px;
+		}
+
+		.logo span {
+			color: var(--blue);
+		}
+
+		main {
+			width: 100%;
+			max-width: 600px;
+			margin: 0 auto;
+			padding: 28px 18px 30px;
+		}
+
+		.intro {
+			margin-bottom: 22px;
+		}
+
+		h1 {
+			margin: 0 0 7px;
+			font-size: 30px;
+		}
+
+		.intro p {
+			margin: 0;
+			color: var(--muted);
+			font-size: 15px;
+		}
+
+		.options {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 14px;
+		}
+
+		.option-button {
+			min-height: 170px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+			padding: 18px 12px;
+			border-radius: var(--radius);
+			background: var(--card);
+			box-shadow: var(--shadow);
+			color: var(--text);
+			transition: transform 0.12s ease;
+		}
+
+		.option-button:active {
+			transform: scale(0.97);
+		}
+
+		.option-icon {
+			width: 58px;
+			height: 58px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 17px;
+			background: var(--blue-light);
+			color: var(--blue);
+			font-size: 29px;
+		}
+
+		.option-label {
+			font-size: 18px;
+			font-weight: 700;
+		}
+
+		.option-description {
+			color: var(--muted);
+			font-size: 12px;
+			text-align: center;
+		}
+
+		.checklist-view {
+			display: none;
+		}
+
+		.view-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			margin-bottom: 18px;
+		}
+
+		.view-header h2 {
+			margin: 0;
+			font-size: 21px;
+		}
+
+		.text-button {
+			padding: 9px 12px;
+			border-radius: 12px;
+			background: var(--blue-light);
+			color: var(--blue-dark);
+			font-size: 13px;
+			font-weight: 700;
+		}
+
+		.form-card,
+		.product-card {
+			padding: 16px;
+			border-radius: 16px;
+			background: var(--card);
+			box-shadow: var(--shadow);
+		}
+
+		.form-card {
+			display: grid;
+			grid-template-columns: 1.5fr 1fr 1fr;
+			gap: 10px;
+			margin-bottom: 18px;
+		}
+
+		.field label {
+			display: block;
+			margin-bottom: 6px;
+			color: var(--muted);
+			font-size: 12px;
+			font-weight: 700;
+		}
+
+		.field input {
+			width: 100%;
+			height: 42px;
+			border: 0;
+			border-radius: 11px;
+			padding: 0 10px;
+			background: var(--bg);
+			color: var(--text);
+			font: inherit;
+		}
+
+		.turn-section {
+			margin-bottom: 20px;
+		}
+
+		.turn-section h3 {
+			margin: 0 0 9px;
+			padding: 10px 12px;
+			border-radius: 11px;
+			background: var(--text);
+			color: white;
+			font-size: 15px;
+		}
+
+		.product-card {
+			margin-bottom: 8px;
+		}
+
+		.product-name {
+			display: flex;
+			align-items: baseline;
+			gap: 7px;
+			margin-bottom: 10px;
+			font-size: 14px;
+			font-weight: 700;
+		}
+
+		.product-code {
+			color: var(--muted);
+			font-size: 12px;
+		}
+
+		.product-fields {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 7px;
+		}
+
+		.product-fields label {
+			color: var(--muted);
+			font-size: 10px;
+			font-weight: 700;
+		}
+
+		.product-fields input {
+			width: 100%;
+			height: 36px;
+			margin-top: 4px;
+			border: 1px solid #dfe3e8;
+			border-radius: 8px;
+			padding: 0 6px;
+			font: inherit;
+			font-size: 13px;
+		}
+
+		.product-fields input:focus,
+		.field input:focus {
+			outline: 2px solid rgba(33, 150, 243, 0.25);
+			border-color: var(--blue);
+		}
+
+		.checklist-summary {
+			position: sticky;
+			bottom: 12px;
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			margin-top: 22px;
+			padding: 14px 16px;
+			border-radius: 14px;
+			background: var(--blue-dark);
+			box-shadow: var(--shadow);
+			color: white;
+			font-size: 13px;
+			font-weight: 700;
+		}
+
+		.sales-view {
+			display: none;
+		}
+
+		.sales-form {
+			display: grid;
+			gap: 12px;
+			margin-bottom: 20px;
+			padding: 16px;
+			border-radius: 16px;
+			background: var(--card);
+			box-shadow: var(--shadow);
+		}
+
+		.sales-form .field input,
+		.sales-form .field select {
+			width: 100%;
+			height: 44px;
+			border: 0;
+			border-radius: 11px;
+			padding: 0 10px;
+			background: var(--bg);
+			color: var(--text);
+			font: inherit;
+		}
+
+		.sales-form-row {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px;
+		}
+
+		.sales-form .field small {
+			display: block;
+			margin-top: 4px;
+			color: var(--muted);
+			font-size: 11px;
+		}
+
+		.check-option {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			color: var(--text);
+			font-size: 13px;
+		}
+
+		.check-option input {
+			width: 18px;
+			height: 18px;
+			accent-color: var(--blue);
+		}
+
+		.primary-action {
+			min-height: 46px;
+			border-radius: 12px;
+			background: var(--blue);
+			color: white;
+			font-weight: 700;
+		}
+
+		.period-tabs {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 8px;
+			margin-bottom: 12px;
+		}
+
+		.period-tab {
+			padding: 11px 8px;
+			border-radius: 11px;
+			background: #dfe8ef;
+			color: var(--muted);
+			font-size: 12px;
+			font-weight: 700;
+		}
+
+		.period-tab.active {
+			background: var(--blue-dark);
+			color: white;
+		}
+
+		.sales-table-wrap {
+			overflow-x: auto;
+			border-radius: 16px;
+			background: var(--card);
+			box-shadow: var(--shadow);
+		}
+
+		.sales-table {
+			width: 100%;
+			min-width: 440px;
+			border-collapse: collapse;
+			font-size: 13px;
+		}
+
+		.sales-table th,
+		.sales-table td {
+			padding: 12px 10px;
+			border-bottom: 1px solid #edf0f2;
+			text-align: left;
+		}
+
+		.sales-table th {
+			color: var(--muted);
+			font-size: 11px;
+			text-transform: uppercase;
+		}
+
+		.sales-table td:last-child,
+		.sales-table th:last-child {
+			text-align: right;
+		}
+
+		.empty-sales {
+			padding: 24px 16px;
+			color: var(--muted);
+			text-align: center;
+		}
+
+		.sales-total {
+			display: flex;
+			justify-content: space-between;
+			padding: 14px 16px;
+			font-weight: 700;
+		}
+
+		.sales-balance {
+			color: var(--muted);
+			font-size: 13px;
+			font-weight: 700;
+		}
+
+		@media (max-width: 360px) {
+			.options {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.form-card {
+				grid-template-columns: 1fr 1fr;
+			}
+
+			.form-card .field:first-child {
+				grid-column: 1 / -1;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header class="topbar">
+		<button
+			type="button"
+			class="back-button"
+			aria-label="Volver al panel principal"
+			onclick="window.location.href = 'index.html'"
+		>
+			&#8592;
+		</button>
+
+		<div class="logo">Cor<span>tex</span></div>
+
+		<div aria-hidden="true" style="width: 42px;"></div>
+	</header>
+
+	<main>
+		<section class="intro">
+			<h1>Aditivos</h1>
+			<p>Gestiona las ventas y revisa el estado operativo.</p>
+		</section>
+
+		<section class="options" aria-label="Opciones de aditivos">
+			<button type="button" class="option-button" onclick="abrirVentas()">
+				<div class="option-icon">🧴</div>
+				<div class="option-label">Ventas</div>
+				<div class="option-description">Registro de ventas</div>
+			</button>
+
+			<button type="button" class="option-button" onclick="abrirChecklist()">
+				<div class="option-icon">✓</div>
+				<div class="option-label">Check List</div>
+				<div class="option-description">Revisión de operación</div>
+			</button>
+		</section>
+
+		<section id="checklistView" class="checklist-view" aria-labelledby="checklistTitle">
+			<div class="view-header">
+				<h2 id="checklistTitle">Check List</h2>
+				<button type="button" class="text-button" onclick="cerrarChecklist()">Volver</button>
+			</div>
+
+			<div class="form-card">
+				<div class="field">
+					<label for="stationInput">Estación de servicio</label>
+					<input id="stationInput" type="text" placeholder="Nombre o número">
+				</div>
+				<div class="field">
+					<label for="islandInput">Isla o dispensario</label>
+					<input id="islandInput" type="text" placeholder="Ej. 1">
+				</div>
+				<div class="field">
+					<label for="dateInput">Fecha</label>
+					<input id="dateInput" type="date">
+				</div>
+			</div>
+
+			<div id="checklistContent"></div>
+
+			<div class="checklist-summary">
+				<span id="pieceSummary">Piezas: 0</span>
+				<span id="amountSummary">Importe: $0.00</span>
+			</div>
+		</section>
+
+		<section id="salesView" class="sales-view" aria-labelledby="salesTitle">
+			<div class="view-header">
+				<h2 id="salesTitle">Ventas</h2>
+				<button type="button" class="text-button" onclick="cerrarVentas()">Volver</button>
+			</div>
+
+			<div class="sales-form">
+				<div class="field">
+					<label for="salesProduct">Producto</label>
+					<input id="salesProduct" list="salesProductList" type="search" placeholder="Busca por nombre o código" autocomplete="off">
+					<datalist id="salesProductList"></datalist>
+					<small id="salesProductHint">Selecciona un producto del catálogo.</small>
+				</div>
+
+				<div class="sales-form-row">
+					<div class="field">
+						<label for="salesPieces">Piezas</label>
+						<input id="salesPieces" type="number" min="1" step="1" value="1">
+					</div>
+					<div class="field">
+						<label for="salesAmount">$ total</label>
+						<input id="salesAmount" type="number" min="0" step="0.01" placeholder="Se calcula con el precio">
+					</div>
+				</div>
+
+				<label class="check-option">
+					<input id="subtractUnassigned" type="checkbox">
+					Restar de piezas sin asignar
+				</label>
+				<button type="button" class="primary-action" onclick="registrarVenta()">Registrar venta</button>
+			</div>
+
+			<div class="period-tabs">
+				<button id="currentTurnTab" type="button" class="period-tab active" onclick="mostrarPeriodo('turn')">Turno actual</button>
+				<button id="currentPeriodTab" type="button" class="period-tab" onclick="mostrarPeriodo('current')"></button>
+				<button id="previousPeriodTab" type="button" class="period-tab" onclick="mostrarPeriodo('previous')"></button>
+			</div>
+
+			<div id="salesTableWrap" class="sales-table-wrap"></div>
+		</section>
+	</main>
+
+	<script src="productlist.js"></script>
+	<script>
+		const CHECKLIST_KEY = "cortex.aditivos.checklist";
+		const SALES_KEY = "cortex.aditivos.sales";
+		let periodoVentas = "turn";
+		let ventasData = prepararVentas();
+
+		const productosVenta = window.CORTEX_PRODUCTOS || [];
+
+		const productos = [
+			[5, "Resistance 5 Lt"],
+			[6, "Brio Verde 900 ml"],
+			[7, "Brio azul 900 ml"],
+			[8, "Brio dorado 900 ml"],
+			[11, "Brio azul 5 Lt"],
+			[14, "Premium 946 ml"],
+			[15, "ATF III 946 ml"],
+			[17, "Limpiador de inyectores 250 ml"],
+			[18, "Aditivo gasolina 250 ml"],
+			[20, "Líquido de frenos 250 ml"],
+			[21, "Agua para batería 460 ml"],
+			[23, "Aditivo diesel 1 Lt"],
+			[24, "Supertratamiento 473 ml"],
+			[25, "Aditivo para aceite 443 ml"],
+			[26, "Limpiaparabrisas 1 Lt"],
+			[32, "Anticongelante 1 Lt"],
+			[48, "Marine (náutico) 946 ml"],
+			[49, "Motorcycle 250 ml"],
+			[50, "Intense 5 Lt"],
+			[51, "Premium 5 Lt"],
+			[52, "Resistance 946 ml"],
+			[54, "Force 946 ml"],
+			[56, "Intense 946 ml"],
+			[57, "Anticongelante (garrafa) 3.7 Lt"],
+			[58, "Dirección hidráulica power steel 250 ml"],
+			[66, "Extra fleet 946 ml"],
+			[67, "Spitzen 1 Lt"],
+			[72, "Moto 4 tiempos 946 ml"],
+			[87, "Synthetic 250 ml"],
+			[99, "Car Cosmetic (paquete)"],
+			[118, "Universal ATF 946 ml"],
+			[119, "Anticongelante Rosa 1 Lt"],
+			[121, "Green Gasolina 250 ml"]
+		];
+
+		function mostrarAviso(opcion) {
+			alert(`${opcion}: módulo en construcción.`);
+		}
+
+		function obtenerMesActual() {
+			return new Date().toISOString().slice(0, 7);
+		}
+
+		function prepararVentas() {
+			const mesActual = obtenerMesActual();
+			const mesAnterior = obtenerMesAnterior(mesActual);
+			const guardado = JSON.parse(localStorage.getItem(SALES_KEY) || "null") || {};
+			if (guardado.currentMonth !== mesActual) {
+				guardado.previousMonth = guardado.currentMonth || null;
+				guardado.previous = guardado.current || crearPeriodo(mesActual);
+				guardado.currentMonth = mesActual;
+				guardado.current = crearPeriodo(mesActual);
+				localStorage.setItem(SALES_KEY, JSON.stringify(guardado));
+			}
+			return {
+				currentMonth: guardado.currentMonth || mesActual,
+				previousMonth: guardado.previousMonth || mesAnterior,
+				current: guardado.current || crearPeriodo(mesActual),
+				previous: guardado.previous || crearPeriodo(mesActual)
+			};
+		}
+
+		function obtenerMesAnterior(mes) {
+			const fecha = new Date(`${mes}-01T00:00:00Z`);
+			fecha.setUTCMonth(fecha.getUTCMonth() - 1);
+			return fecha.toISOString().slice(0, 7);
+		}
+
+		function obtenerNombreMes(mes) {
+			if (!mes) return "Mes anterior";
+			return new Intl.DateTimeFormat("es-MX", { month: "long", timeZone: "UTC" })
+				.format(new Date(`${mes}-01T00:00:00Z`))
+				.replace(/^./, letra => letra.toUpperCase());
+		}
+
+		function obtenerEstadoCortex() {
+			return JSON.parse(localStorage.getItem("cortex") || "null") || {};
+		}
+
+		function sincronizarSaldoLecturas() {
+			const estado = obtenerEstadoCortex();
+			if (!estado.turnData || estado.turnData.aditivosSinAsignar !== undefined) return;
+			estado.turnData.aditivosSinAsignar = Number(estado.turnData.aditivos) || 0;
+			localStorage.setItem("cortex", JSON.stringify(estado));
+		}
+
+		function crearPeriodo(mes) {
+			return { month: mes, sales: [], unassigned: {} };
+		}
+
+		function abrirVentas() {
+			document.querySelector(".options").style.display = "none";
+			document.querySelector(".intro").style.display = "none";
+			document.getElementById("salesView").style.display = "block";
+			sincronizarSaldoLecturas();
+			llenarCatalogoVentas();
+			document.getElementById("currentPeriodTab").textContent = obtenerNombreMes(ventasData.currentMonth);
+			document.getElementById("previousPeriodTab").textContent = obtenerNombreMes(ventasData.previousMonth);
+			actualizarProductoVenta();
+			renderVentas();
+		}
+
+		function cerrarVentas() {
+			document.getElementById("salesView").style.display = "none";
+			document.querySelector(".options").style.display = "grid";
+			document.querySelector(".intro").style.display = "block";
+		}
+
+		function llenarCatalogoVentas() {
+			document.getElementById("salesProductList").innerHTML = productosVenta.map(producto =>
+				`<option value="${producto.nombre}" label="Código ${producto.codigo} - $${producto.precio}"></option><option value="${producto.codigo}" label="${producto.nombre} - $${producto.precio}"></option>`
+			).join("");
+		}
+
+		function normalizarTexto(texto) {
+			return texto
+				.normalize("NFD")
+				.replace(/[\u0300-\u036f]/g, "")
+				.toLowerCase()
+				.replace(/\s+/g, " ")
+				.trim();
+		}
+
+		function encontrarProductoVenta() {
+			const busqueda = normalizarTexto(document.getElementById("salesProduct").value);
+			if (!busqueda) return null;
+			return productosVenta.find(producto => normalizarTexto(producto.nombre) === busqueda || normalizarTexto(producto.codigo) === busqueda) ||
+				productosVenta.find(producto => normalizarTexto(producto.nombre).includes(busqueda) || normalizarTexto(producto.codigo).includes(busqueda));
+		}
+
+		function actualizarProductoVenta() {
+			const producto = encontrarProductoVenta();
+			const hint = document.getElementById("salesProductHint");
+			if (!producto) {
+				hint.textContent = "Selecciona un producto del catálogo.";
+				return;
+			}
+			hint.textContent = `Código ${producto.codigo} - $${producto.precio} por pieza`;
+			const amount = document.getElementById("salesAmount");
+			if (!amount.value || amount.dataset.auto === "true") {
+				amount.value = producto.precio * (Number(document.getElementById("salesPieces").value) || 1);
+				amount.dataset.auto = "true";
+			}
+		}
+
+		function registrarVenta() {
+			const producto = encontrarProductoVenta();
+			const piezas = Number(document.getElementById("salesPieces").value);
+			const importeCapturado = Number(document.getElementById("salesAmount").value);
+			const importe = Number.isFinite(importeCapturado) && importeCapturado > 0
+				? importeCapturado
+				: producto?.precio * piezas;
+			const periodo = ventasData.current;
+			const restar = document.getElementById("subtractUnassigned").checked;
+			if (!producto || !Number.isInteger(piezas) || piezas < 1 || !Number.isFinite(importe) || importe < 0) {
+				alert("Selecciona un producto del catálogo e indica piezas y un importe válido.");
+				return;
+			}
+			const estado = obtenerEstadoCortex();
+			if (!estado.turnData || typeof estado.turnData !== "object") {
+				estado.turnData = {
+					readings: {},
+					transactions: [],
+					createdAt: new Date().toISOString(),
+					aditivos: 0
+				};
+			}
+			const turnoActual = obtenerTurnoActual();
+			const ventasRegistradas = (periodo.sales || [])
+				.filter(venta => venta.turn === turnoActual)
+				.reduce((total, venta) => total + (Number(venta.amount) || 0), 0);
+			const totalAditivos = Number(estado.turnData.aditivos) || 0;
+			const saldoLecturas = Math.max(0, totalAditivos - ventasRegistradas);
+			if (restar && saldoLecturas < importe) {
+				alert(`No hay suficiente saldo sin asignar. Disponible: $${saldoLecturas.toFixed(2)}.`);
+				return;
+			}
+			periodo.sales.unshift({
+				productCode: producto.codigo,
+				productName: producto.nombre,
+				pieces: piezas,
+				amount: importe,
+				turnId: estado.activeTurn?.id || null,
+				turn: turnoActual,
+				createdAt: new Date().toISOString()
+			});
+			estado.turnData.aditivos = restar
+				? totalAditivos
+				: totalAditivos + importe;
+			if (restar) {
+				estado.turnData.aditivosSinAsignar = saldoLecturas - importe;
+			}
+			localStorage.setItem("cortex", JSON.stringify(estado));
+			guardarVentas();
+			document.getElementById("salesPieces").value = 1;
+			document.getElementById("salesAmount").value = "";
+			document.getElementById("salesAmount").dataset.auto = "false";
+			document.getElementById("subtractUnassigned").checked = false;
+			renderVentas();
+		}
+
+		function obtenerTurnoActual() {
+			const estado = obtenerEstadoCortex();
+			return estado?.activeTurn?.turno || "Sin turno";
+		}
+
+		function guardarVentas() {
+			localStorage.setItem(SALES_KEY, JSON.stringify(ventasData));
+		}
+
+		function mostrarPeriodo(periodo) {
+			periodoVentas = periodo;
+			document.getElementById("currentTurnTab").classList.toggle("active", periodo === "turn");
+			document.getElementById("currentPeriodTab").classList.toggle("active", periodo === "current");
+			document.getElementById("previousPeriodTab").classList.toggle("active", periodo === "previous");
+			renderVentas();
+		}
+
+		function renderVentas() {
+			const periodo = periodoVentas === "previous" ? ventasData.previous : ventasData.current;
+			const estado = obtenerEstadoCortex();
+			const turnoActual = estado.activeTurn?.turno;
+			const ventas = (periodo?.sales || []).filter(venta => periodoVentas !== "turn" || venta.turn === (turnoActual || "Sin turno"));
+			const filas = ventas.map(venta => `
+				<tr><td>${venta.pieces}</td><td>${venta.productName}<br><small>Turno ${venta.turn}</small></td><td>$${Number(venta.amount).toFixed(2)}</td></tr>
+			`).join("");
+			const totalRegistrado = ventas.reduce((total, venta) => total + Number(venta.amount || 0), 0);
+			const totalAditivos = periodoVentas === "turn" ? Number(estado.turnData?.aditivos) || 0 : totalRegistrado;
+			const saldoSinAsignar = Math.max(0, totalAditivos - totalRegistrado);
+			const resumenSaldo = periodoVentas === "turn"
+				? `<div class="sales-total sales-balance"><span>Saldo sin asignar</span><span>$${saldoSinAsignar.toFixed(2)}</span></div>`
+				: "";
+			document.getElementById("salesTableWrap").innerHTML = !ventas.length
+				? `<div class="empty-sales">No hay ventas registradas en este periodo.</div>`
+				: `<table class="sales-table"><thead><tr><th>Piezas</th><th>Nombre del producto</th><th>$ total</th></tr></thead><tbody>${filas}</tbody></table><div class="sales-total"><span>Total productos registrados</span><span>$${totalRegistrado.toFixed(2)}</span></div>${resumenSaldo}`;
+		}
+
+		document.getElementById("salesProduct").addEventListener("input", actualizarProductoVenta);
+		document.getElementById("salesPieces").addEventListener("input", actualizarProductoVenta);
+		document.getElementById("salesAmount").addEventListener("input", event => event.target.dataset.auto = "false");
+
+		function abrirChecklist() {
+			document.querySelector(".options").style.display = "none";
+			document.querySelector(".intro").style.display = "none";
+			document.getElementById("checklistView").style.display = "block";
+			const datosGuardados = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || "null");
+			const estadoCortex = JSON.parse(localStorage.getItem("cortex") || "null");
+			document.getElementById("stationInput").value = datosGuardados?.station || "La Tinaja";
+			document.getElementById("islandInput").value = datosGuardados?.island || estadoCortex?.activeTurn?.isla || "";
+			document.getElementById("dateInput").value = datosGuardados?.date || new Date().toISOString().slice(0, 10);
+			renderChecklist();
+		}
+
+		function cerrarChecklist() {
+			document.getElementById("checklistView").style.display = "none";
+			document.querySelector(".options").style.display = "grid";
+			document.querySelector(".intro").style.display = "block";
+		}
+
+		function renderChecklist() {
+			const content = document.getElementById("checklistContent");
+			content.innerHTML = `
+				<div class="turn-section">
+					<h3>Invenrario</h3>
+					${productos.map(([codigo, nombre]) => `
+						<div class="product-card">
+							<div class="product-name"><span class="product-code">${codigo}</span>${nombre}</div>
+							<div class="product-fields">
+								<label>Recibe turno<input type="number" min="0" data-field="recibeTurno" data-producto="${codigo}"></label>
+								<label>Almacén<input type="number" min="0" data-field="almacen" data-producto="${codigo}"></label>
+								<label>P/TB (pz)<input type="number" min="0" data-field="ptb" data-producto="${codigo}"></label>
+								<label>Importe $<input type="number" min="0" step="0.01" data-field="importe" data-producto="${codigo}"></label>
+							</div>
+						</div>
+					`).join("")}
+				</div>
+			`;
+
+			content.querySelectorAll("input").forEach(input => {
+				input.addEventListener("input", guardarChecklist);
+			});
+			cargarChecklist();
+		}
+
+		function guardarChecklist() {
+			const datos = {
+				station: document.getElementById("stationInput").value,
+				island: document.getElementById("islandInput").value,
+				date: document.getElementById("dateInput").value,
+				fields: {}
+			};
+
+			document.querySelectorAll("#checklistContent input").forEach(input => {
+				datos.fields[`${input.dataset.producto}-${input.dataset.field}`] = input.value;
+			});
+			localStorage.setItem(CHECKLIST_KEY, JSON.stringify(datos));
+			actualizarResumen();
+		}
+
+		function cargarChecklist() {
+			const datos = JSON.parse(localStorage.getItem(CHECKLIST_KEY) || "null");
+			if (!datos) {
+				actualizarResumen();
+				return;
+			}
+
+			document.getElementById("stationInput").value = datos.station || "";
+			document.getElementById("islandInput").value = datos.island || "";
+			document.getElementById("dateInput").value = datos.date || "";
+			document.querySelectorAll("#checklistContent input").forEach(input => {
+				input.value = datos.fields?.[`${input.dataset.producto}-${input.dataset.field}`] || "";
+			});
+			actualizarResumen();
+		}
+
+		function actualizarResumen() {
+			let piezas = 0;
+			let importe = 0;
+			document.querySelectorAll('input[data-field="ptb"]').forEach(input => piezas += Number(input.value) || 0);
+			document.querySelectorAll('input[data-field="importe"]').forEach(input => importe += Number(input.value) || 0);
+			document.getElementById("pieceSummary").textContent = `Piezas: ${piezas}`;
+			document.getElementById("amountSummary").textContent = `Importe: $${importe.toFixed(2)}`;
+		}
+
+		document.querySelectorAll(".form-card input").forEach(input => input.addEventListener("input", guardarChecklist));
+	</script>
+</body>
+</html>

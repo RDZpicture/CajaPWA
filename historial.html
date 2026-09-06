@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#ffffff">
+  <title>Cortex - Historial de cortes</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --blue: #1976d2;
+      --blue-light: #e3f2fd;
+      --green: #18851d;
+      --bg: #f1f4f5;
+      --card: #fff;
+      --input: #e7eaee;
+      --text: #111;
+      --muted: #6d7785;
+      --border: #d9dee5;
+      --shadow: 0 4px 12px rgba(0, 0, 0, .1);
+    }
+    html, body { margin: 0; min-height: 100%; font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); }
+    body { padding-bottom: 28px; }
+    .topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; background: rgba(255,255,255,.97); border-bottom: 1px solid rgba(0,0,0,.05); position: sticky; top: 0; z-index: 2; }
+    .logo { color: var(--text); font-size: 28px; font-weight: 800; letter-spacing: -1px; text-decoration: none; }
+    .logo span { color: #2196f3; }
+    .back { color: var(--blue); text-decoration: none; font-weight: 700; font-size: 14px; }
+    main { width: 100%; max-width: 900px; margin: 0 auto; padding: 22px 18px; }
+    h1 { margin: 0 0 6px; font-size: 30px; }
+    .intro { margin: 0 0 20px; color: var(--muted); }
+    .layout { display: grid; grid-template-columns: minmax(220px, .75fr) minmax(0, 1.5fr); gap: 16px; align-items: start; }
+    .panel, .cut-item { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); }
+    .panel { padding: 18px; }
+    .panel h2 { margin: 0 0 14px; font-size: 19px; }
+    .cut-list { display: grid; gap: 9px; }
+    .cut-item { width: 100%; padding: 13px; text-align: left; border: 2px solid transparent; cursor: pointer; color: var(--text); }
+    .cut-item.active { border-color: var(--blue); background: var(--blue-light); }
+    .cut-date { display: block; font-weight: 700; margin-bottom: 4px; }
+    .cut-meta { display: block; color: var(--muted); font-size: 13px; }
+    .empty { color: var(--muted); line-height: 1.5; }
+    .detail-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 14px; }
+    .detail-head h2 { margin: 0 0 5px; }
+    .status { color: var(--green); font-size: 13px; font-weight: 700; white-space: nowrap; }
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 18px; }
+    .metric { background: var(--input); border-radius: 11px; padding: 11px; }
+    .metric small { display: block; color: var(--muted); margin-bottom: 4px; }
+    .metric strong { font-size: 18px; }
+    .section { margin-top: 18px; }
+    .section h3 { font-size: 16px; margin: 0 0 8px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px 6px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 700; }
+    .reading-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .reading { border: 1px solid var(--border); border-radius: 9px; padding: 9px; font-size: 13px; }
+    .reading strong { display: block; margin-bottom: 4px; }
+    @media (max-width: 680px) { .layout { grid-template-columns: 1fr; } .summary { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="index.html">Cort<span>e</span>x</a>
+    <a class="back" href="index.html">Volver al menú</a>
+  </header>
+  <main>
+    <h1>Historial de cortes</h1>
+    <p class="intro">Consulta los cortes cerrados durante los últimos 30 días.</p>
+    <div class="layout">
+      <section class="panel">
+        <h2>Cortes guardados</h2>
+        <div id="cutList" class="cut-list"></div>
+      </section>
+      <section id="detail" class="panel"></section>
+    </div>
+  </main>
+  <script>
+    const STORAGE_KEY = "cortex";
+    const DAY_MS = 24 * 60 * 60 * 1000;
+
+    function money(value) {
+      return Number(value || 0).toLocaleString("es-MX", { style: "currency", currency: "MXN" });
+    }
+
+    function dateTime(value) {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? "Fecha desconocida" : date.toLocaleString("es-MX");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[character]));
+    }
+
+    function obtenerCortes() {
+      try {
+        const estado = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        const limite = Date.now() - (30 * DAY_MS);
+        return (Array.isArray(estado.history) ? estado.history : [])
+          .filter(corte => new Date(corte.closedAt).getTime() >= limite)
+          .sort((a, b) => new Date(b.closedAt) - new Date(a.closedAt));
+      } catch (error) {
+        console.error("Error leyendo el historial:", error);
+        return [];
+      }
+    }
+
+    function totalTransacciones(corte) {
+      return (corte.turnData?.transactions || []).reduce((total, transaccion) => total + Number(transaccion.monto ?? transaccion.amount ?? 0), 0);
+    }
+
+    function totalVentas(corte) {
+      return (corte.sales || []).reduce((total, venta) => total + Number(venta.amount || 0), 0);
+    }
+
+    function renderCorte(corte) {
+      const turno = corte.activeTurn || {};
+      const datos = corte.turnData || {};
+      const transacciones = Array.isArray(datos.transactions) ? datos.transactions : [];
+      const ventas = Array.isArray(corte.sales) ? corte.sales : [];
+      const lecturas = datos.readings || {};
+      const lecturaItems = Object.entries(lecturas).flatMap(([dispensador, productos]) =>
+        Object.entries(productos || {}).map(([producto, valores]) => `<div class="reading"><strong>Disp. ${escapeHtml(dispensador)} · ${escapeHtml(producto)}</strong>Inicial: ${escapeHtml(valores?.inicial ?? "-")}<br>Final: ${escapeHtml(valores?.final ?? "-")}<br>Total de litros: ${escapeHtml(Math.max(0, Number(valores?.final || 0) - Number(valores?.inicial || 0)).toFixed(2))}</div>`)
+      ).join("");
+      document.getElementById("detail").innerHTML = `
+        <div class="detail-head"><div><h2>Turno ${escapeHtml(turno.turno || "-")}</h2><div>${dateTime(corte.closedAt)} · Isla ${escapeHtml(turno.isla || "-")}</div></div><span class="status">Corte cerrado</span></div>
+        <div class="summary"><div class="metric"><small>Transacciones</small><strong>${transacciones.length}</strong></div><div class="metric"><small>Total caja</small><strong>${money(totalTransacciones(corte))}</strong></div><div class="metric"><small>Total Sistema</small><strong>${money(datos.totalSistema)}</strong></div><div class="metric"><small>Ventas aditivos</small><strong>${money(totalVentas(corte))}</strong></div><div class="metric"><small>Lecturas</small><strong>${Object.keys(lecturas).length} dispensadores</strong></div><div class="metric"><small>Aditivos del turno</small><strong>${money(datos.aditivos)}</strong></div></div>
+        <div class="section"><h3>Transacciones</h3>${transacciones.length ? `<div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Cliente</th><th>Total</th></tr></thead><tbody>${transacciones.map(item => `<tr><td>${escapeHtml(item.tipo || item.type || "Venta")}</td><td>${escapeHtml(item.numeroCliente || item.clientName || "-")}</td><td>${money(item.monto ?? item.amount)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">No hubo transacciones registradas.</div>`}</div>
+        <div class="section"><h3>Ventas de aditivos</h3>${ventas.length ? `<div class="table-wrap"><table><thead><tr><th>Piezas</th><th>Producto</th><th>Total</th></tr></thead><tbody>${ventas.map(item => `<tr><td>${escapeHtml(item.pieces)}</td><td>${escapeHtml(item.productName)}</td><td>${money(item.amount)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">No hubo ventas de aditivos.</div>`}</div>
+        <div class="section"><h3>Lecturas</h3>${lecturaItems ? `<div class="reading-grid">${lecturaItems}</div>` : `<div class="empty">No hubo lecturas guardadas.</div>`}</div>`;
+    }
+
+    function render() {
+      const cortes = obtenerCortes();
+      const list = document.getElementById("cutList");
+      if (!cortes.length) {
+        list.innerHTML = `<div class="empty">Todavía no hay cortes cerrados en los últimos 30 días.</div>`;
+        document.getElementById("detail").innerHTML = `<div class="empty">Selecciona un corte para consultar sus datos.</div>`;
+        return;
+      }
+      list.innerHTML = cortes.map((corte, index) => `<button class="cut-item${index === 0 ? " active" : ""}" type="button" data-index="${index}"><span class="cut-date">Turno ${escapeHtml(corte.activeTurn?.turno || "-")}</span><span class="cut-meta">${dateTime(corte.closedAt)} · Isla ${escapeHtml(corte.activeTurn?.isla || "-")}</span></button>`).join("");
+      list.querySelectorAll(".cut-item").forEach(button => button.addEventListener("click", () => {
+        list.querySelectorAll(".cut-item").forEach(item => item.classList.remove("active"));
+        button.classList.add("active");
+        renderCorte(cortes[Number(button.dataset.index)]);
+      }));
+      renderCorte(cortes[0]);
+    }
+
+    render();
+  </script>
+</body>
+</html>
