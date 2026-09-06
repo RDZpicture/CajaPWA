@@ -963,6 +963,23 @@
       return rows;
     }
 
+    function getReadingTotals() {
+      return Object.fromEntries(
+        Object.entries(data).filter(([key]) => ["magna", "premium", "diesel"].includes(key)).map(([product, rows]) => {
+          const litros = normalizeReadingArray(rows).reduce((total, row) => {
+            const finalValue = row.final ?? row.ultimo ?? row.fin ?? 0;
+            const inicialValue = row.inicial ?? row.inicio ?? row.ini ?? 0;
+            return total + Math.max(0, toNumber(row.litros ?? (toNumber(finalValue) - toNumber(inicialValue)), 0));
+          }, 0);
+          return [product, { litros, pesos: litros * toNumber(readLocalData().config?.precios?.[product], 0) }];
+        })
+      );
+    }
+
+    function isProductActive(product) {
+      return normalizeReadingArray(data[product]).length > 0;
+    }
+
     function buildReadingRows(typeName, list) {
       const maxRows = Math.max(4, list.length || 4);
       const tbody = document.querySelector(`#tabla${typeName} tbody`);
@@ -999,12 +1016,13 @@
       document.getElementById("totalPremiumLitros").textContent = readingInteger(totalPremium);
       document.getElementById("totalDieselLitros").textContent = readingInteger(totalDiesel);
 
-      const ventaMagnaLitros = toNumber(data.ventas?.magna?.litros, 0);
-      const ventaPremiumLitros = toNumber(data.ventas?.premium?.litros, 0);
-      const ventaDieselLitros = toNumber(data.ventas?.diesel?.litros, 0);
-      const ventaMagnaPesos = toNumber(data.ventas?.magna?.pesos, 0);
-      const ventaPremiumPesos = toNumber(data.ventas?.premium?.pesos, 0);
-      const ventaDieselPesos = toNumber(data.ventas?.diesel?.pesos, 0);
+      const readingTotals = getReadingTotals();
+      const ventaMagnaLitros = readingTotals.magna.litros;
+      const ventaPremiumLitros = readingTotals.premium.litros;
+      const ventaDieselLitros = readingTotals.diesel.litros;
+      const ventaMagnaPesos = readingTotals.magna.pesos;
+      const ventaPremiumPesos = readingTotals.premium.pesos;
+      const ventaDieselPesos = readingTotals.diesel.pesos;
       const aceites = toNumber(data.ventas?.aceites, 0);
       const totalCombustibleLitros = ventaMagnaLitros + ventaPremiumLitros + ventaDieselLitros;
       const totalCombustiblePesos = ventaMagnaPesos + ventaPremiumPesos + ventaDieselPesos;
@@ -1012,12 +1030,12 @@
       const totalSistema = toNumber(data.totalSistema, 0);
       const diferencia = totalSistema - totalVendido;
 
-      document.getElementById("ventaMagnaLitros").textContent = liters(ventaMagnaLitros);
-      document.getElementById("ventaPremiumLitros").textContent = liters(ventaPremiumLitros);
-      document.getElementById("ventaDieselLitros").textContent = liters(ventaDieselLitros);
-      document.getElementById("ventaMagnaPesos").textContent = money(ventaMagnaPesos);
-      document.getElementById("ventaPremiumPesos").textContent = money(ventaPremiumPesos);
-      document.getElementById("ventaDieselPesos").textContent = money(ventaDieselPesos);
+      document.getElementById("ventaMagnaLitros").textContent = isProductActive("magna") ? liters(ventaMagnaLitros) : "";
+      document.getElementById("ventaPremiumLitros").textContent = isProductActive("premium") ? liters(ventaPremiumLitros) : "";
+      document.getElementById("ventaDieselLitros").textContent = isProductActive("diesel") ? liters(ventaDieselLitros) : "";
+      document.getElementById("ventaMagnaPesos").textContent = isProductActive("magna") ? money(ventaMagnaPesos) : "";
+      document.getElementById("ventaPremiumPesos").textContent = isProductActive("premium") ? money(ventaPremiumPesos) : "";
+      document.getElementById("ventaDieselPesos").textContent = isProductActive("diesel") ? money(ventaDieselPesos) : "";
       document.getElementById("totalCombustibleLitros").textContent = liters(totalCombustibleLitros);
       document.getElementById("totalCombustiblePesos").textContent = money(totalCombustiblePesos);
       document.getElementById("ventaAceites").textContent = money(aceites);
@@ -1135,26 +1153,17 @@
         .reduce((total, transaction) => total + toNumber(transaction.monto, 0), 0);
 
       data.ventas = {
-        magna: {
-          litros: toNumber(turnData.ventas?.magna?.litros || data.ventas?.magna?.litros, 0),
-          pesos: toNumber(turnData.ventas?.magna?.pesos || data.ventas?.magna?.pesos, 0)
-        },
-        premium: {
-          litros: toNumber(turnData.ventas?.premium?.litros || data.ventas?.premium?.litros, 0),
-          pesos: toNumber(turnData.ventas?.premium?.pesos || data.ventas?.premium?.pesos, 0)
-        },
-        diesel: {
-          litros: toNumber(turnData.ventas?.diesel?.litros || data.ventas?.diesel?.litros, 0),
-          pesos: toNumber(turnData.ventas?.diesel?.pesos || data.ventas?.diesel?.pesos, 0)
-        },
         aceites: toNumber(turnData.aditivos ?? turnData.ventas?.aceites ?? data.ventas?.aceites, 0)
       };
 
-      data.totalSistema = toNumber(turnData.totalSistema || data.totalSistema, 0);
+      data.totalSistema = toNumber(turnData.totalSistema ?? data.totalSistema, 0);
       data.flotillas = flotillaTotal || toNumber(turnData.flotillas || data.flotillas, 0);
       data.netpay = netpayTotal || toNumber(turnData.netpay || data.netpay, 0);
 
-      const flotillas = transactions.filter(t => t && t.tipo === "flotilla");
+      const flotillas = transactions
+        .slice()
+        .reverse()
+        .filter(t => t && t.tipo === "flotilla");
       const groupedCredit = new Map();
       flotillas.forEach(transaction => {
         const numeroCliente = transaction.numeroCliente;
@@ -1185,6 +1194,10 @@
     }
 
     document.addEventListener("DOMContentLoaded", render);
+
+    window.addEventListener("storage", event => {
+      if (event.key === "cortex") render();
+    });
   </script>
 </body>
 </html>
