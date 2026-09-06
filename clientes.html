@@ -776,8 +776,8 @@ function renderClientes(lista = clientes) {
 
           ${
             cliente.apodo
-              ? `<div class="client-alias">
-                   Apodo: ${escapeHtml(cliente.apodo)}
+                  ? `<div class="client-alias">
+                    Apodo: <strong>${escapeHtml(cliente.apodo)}</strong>
                  </div>`
               : `<div class="client-alias">
                    Sin apodo registrado
